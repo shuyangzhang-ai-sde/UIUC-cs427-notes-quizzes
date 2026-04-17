@@ -99,14 +99,7 @@
     nav.className = 'study-nav-list';
     aside.appendChild(header);
     aside.appendChild(nav);
-    var langRoot = document.createElement('div');
-    langRoot.className = 'study-lang-switch-root';
-    langRoot.setAttribute('aria-label', 'Language');
-    aside.appendChild(langRoot);
     root.appendChild(aside);
-    if (typeof window.mountStudyLangSwitch === 'function') {
-      window.mountStudyLangSwitch(langRoot, { inIndex: false });
-    }
     renderStudyNavList(nav, { currentId: currentId, useHash: false });
     syncNotesTitleWithSidebar(currentId);
   }

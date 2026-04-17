@@ -169,18 +169,21 @@
   vertical-align: top;
 }
 
+/* Class/quiz diagrams (e.g. Week 5 UML): no panel background; width matches option buttons */
 .qz-diagram {
-  margin: 12px 0 0;
-  padding: 12px;
-  background: var(--surface2);
+  margin: 10px 0 12px;
+  padding: 0;
+  background: transparent;
   border: none;
-  border-radius: var(--radius);
-  text-align: center;
+  border-radius: 0;
+  text-align: left;
 }
 
 .qz-diagram img {
+  display: block;
+  width: 100%;
   max-width: 100%;
-  max-height: 220px;
+  height: auto;
   object-fit: contain;
   vertical-align: top;
 }

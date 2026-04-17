@@ -12,10 +12,11 @@
   --accent:#3d6b4f;--accent-soft:#edf4ef;
   --blue:#2d5fa6;--blue-soft:#ebf1fb;
   --amber:#7c5c2e;--amber-soft:#fdf4e7;
+  --red:#a63d2d;--red-soft:#fdf0ef;
   --surface2:#f4f3f0;--radius:8px;
 }
 body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:28px 16px 48px;}
-.wrap{max-width:880px;margin:0 auto;}
+.wrap{max-width:1100px;margin:0 auto;}
 h1{font-family:'Lora',serif;font-size:1.35rem;font-weight:600;text-align:center;margin-bottom:8px;letter-spacing:-0.02em;}
 .sub{font-family:'Source Code Pro',monospace;font-size:0.72rem;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:36px;}
 .center{display:flex;justify-content:center;margin-bottom:28px;}
@@ -25,7 +26,7 @@ h1{font-family:'Lora',serif;font-size:1.35rem;font-weight:600;text-align:center;
 }
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  grid-template-columns:repeat(3,1fr);
   gap:12px;
 }
 .cluster{
@@ -39,6 +40,7 @@ h1{font-family:'Lora',serif;font-size:1.35rem;font-weight:600;text-align:center;
 .cluster li::before{content:'·';position:absolute;left:0;color:var(--muted);}
 .cluster.accent h2{color:var(--accent);}
 .cluster.accent .tag{display:inline-block;margin-top:8px;font-size:0.75rem;background:var(--accent-soft);color:var(--accent);padding:4px 8px;border-radius:4px;font-family:'Source Code Pro',monospace;}
+.cluster .tag.red{background:var(--red-soft);color:var(--red);}
 .cluster.blue h2{color:var(--blue);}
 .cluster.amber h2{color:var(--amber);}
 </style>
@@ -66,7 +68,7 @@ h1{font-family:'Lora',serif;font-size:1.35rem;font-weight:600;text-align:center;
         <li>Software Users</li>
         <li>Software Development Process</li>
       </ul>
-      <span class="tag">Excludes Software Design</span>
+      <span class="tag red">Excludes Software Design</span>
     </div>
     <div class="cluster blue">
       <h2>Core concepts</h2>

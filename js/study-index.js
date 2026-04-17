@@ -68,23 +68,11 @@
     }
     if (initial) loadWeek(initial);
 
-    var langRoot = document.getElementById('study-lang-switch-root');
-    if (langRoot && typeof window.mountStudyLangSwitch === 'function') {
-      window.mountStudyLangSwitch(langRoot, { inIndex: true });
-    }
-
     window.addEventListener('hashchange', function () {
       var w = findWeekById(hashToWeekId());
       if (w && w.file) loadWeek(w);
     });
 
-    window.addEventListener('study-lang-change', function () {
-      var w = findWeekById(hashToWeekId());
-      if (!w || !w.file) {
-        w = pickInitialWeek();
-      }
-      if (w && w.file) loadWeek(w);
-    });
   }
 
   if (document.readyState === 'loading') {

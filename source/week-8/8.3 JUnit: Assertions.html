@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8.3 JUnit: Assertions – Study Notes + Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 48px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  header {
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 16px;
+    margin-bottom: 48px;
+  }
+  header .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ── Section ── */
+  .section {
+    margin-bottom: 56px;
+    padding-top: 32px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+  }
+
+  /* ── No quiz: same slide/transcript widths as .cols-with-quiz (third column stays empty) ── */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── 3-col when quiz present ── */
+  .cols-with-quiz {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Column label ── */
+  .col-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ebebeb;
+  }
+  .quiz-col .col-label {
+    color: #6b4fb8;
+    border-bottom-color: #c9b8f0;
+  }
+
+  /* ── Slide content ── */
+  .slide-content {
+    padding: 0;
+  }
+  .slide-content ul { list-style: none; padding: 0; }
+  .slide-content ul li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .slide-content ul li::before { content: "•"; position: absolute; left: 0; color: #888; }
+  .slide-content ul ul { margin-top: 4px; margin-left: 12px; }
+  .slide-content ul ul li::before { content: "·"; color: #aaa; }
+  .slide-content .intro { margin-bottom: 10px; font-size: 14px; }
+
+  .red { color: #c0392b; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+  .cite { font-size: 11px; color: #999; text-align: right; margin-top: 10px; font-style: italic; }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    color: #1a1a1a;
+  }
+  .code-block .kw { color: #c0392b; }
+  .code-block .st { color: #2980b9; }
+
+  /* ── Transcript ── */
+  .transcript p {
+    margin-bottom: 12px;
+    font-size: 14.5px;
+    color: #222;
+  }
+
+  /* ══════════════════════════════════════════
+     HIGHLIGHT STYLES — soft background only,
+     no borders, no outlines, no bold
+  ══════════════════════════════════════════ */
+  .hl-slide {
+    background: #fff3b0;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+  .hl-trans {
+    background: #b8e8ff;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* ══════════════════════════════════════════
+     QUIZ STYLES — minimal, no cards/boxes
+  ══════════════════════════════════════════ */
+  .quiz-item {
+    margin-bottom: 22px;
+  }
+  .quiz-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .quiz-num {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 4px;
+  }
+
+  .quiz-q {
+    font-size: 13px;
+    color: #1a1a1a;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .quiz-q code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  .quiz-options {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0 0;
+  }
+  .quiz-options li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 3px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #555;
+  }
+  .quiz-options li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #aaa;
+  }
+  .quiz-options li.correct {
+    color: #1a6b2e;
+  }
+  .quiz-options li.correct::before {
+    color: #1a6b2e;
+  }
+  .quiz-options li.correct::after {
+    content: " ✓";
+    color: #1a6b2e;
+  }
+
+  .quiz-answer {
+    font-size: 13px;
+    color: #1a1a1a;
+  }
+  .answer-true  { color: #1a6b2e; }
+  .answer-false { color: #8b1a1a; }
+
+  @media (max-width: 960px) {
+    .cols-with-quiz, .cols { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Study Notes · Software Testing</div>
+  <h1>8.3 JUnit: Assertions</h1>
+  <div style="margin-top:10px; font-size:13px; color:#666;">
+    <a href="index.html" style="color:#666; text-decoration:none;">Notebook Index</a>
+    &nbsp;·&nbsp;
+    <a href="8.2%20JUnit%20Overview.html" style="color:#666; text-decoration:none;">Previous section</a>
+    &nbsp;·&nbsp;
+    <a href="8.5%20Parameterized%20Tests%3A%20Basics.html" style="color:#666; text-decoration:none;">Next section</a>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1 – Learning Objectives  (no quiz)
+═══════════════════════════════════════════════ -->
+<div class="section" id="learning-objectives">
+  <div class="section-title">Learning Objectives</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro">By the end of this video, you will be able to</p>
+        <ul>
+          <li>Explain why we need to have the third argument <span class="red">delta</span> for <span class="red">assertEquals</span> when asserting two double or float values.</li>
+          <li>Explain the difference between <span class="red">assertEquals</span> and <span class="red">assertSame</span> when asserting two objects.</li>
+          <li>Use <span class="red">assertAll</span> to write unit test cases.</li>
+          <li>Use <span class="red">assertThrows</span> to write unit test cases.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>This is a lecture video on JUnit Assertions, being part of the lecture topic of Software Testing. By the end of this video, you will be able to explain why we need to have the third argument delta for assertEquals when asserting two double or float values. Explain the difference between assertEquals and assertSame when asserting two objects. Use assertAll to write unit test cases, and use assertThrows to write unit test cases.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2 – Example JUnit Test Case  (no quiz)
+═══════════════════════════════════════════════ -->
+<div class="section" id="example-junit-test-case">
+  <div class="section-title">Example JUnit Test Case</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro"><strong>Class under test:</strong> java.util.Stack</p>
+        <p class="intro" style="margin-bottom:14px; font-size:13px; color:#555;">Test classes/methods don't need to be public.</p>
+        <div class="code-block"><span class="kw">import</span> java.util.Stack;
+<span class="kw">import</span> org.junit.jupiter.api.*;
+<span class="kw">import static</span> org.junit.jupiter.api.Assertions.*;
+
+class TestingAStackDemo
+{
+    <span class="kw">@Test</span>
+    <span class="kw">@DisplayName(</span><span class="st">"Push an element into empty stack"</span><span class="kw">)</span>
+    void testPushOneElem()
+    {
+        String element1 = <span class="st">"element1"</span>;
+        <span class="kw">Stack&lt;Object&gt;</span> stack = new Stack&lt;&gt;();
+        stack.push(element1);
+        <span class="hl-slide">assertEquals(element1, stack.peek());</span>
+        <span class="hl-slide">assertFalse(stack.isEmpty());</span>
+    }
+}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>Now, let's revisit the example JUnit test case. In the end of the unit test method, we have <span class="hl-trans">assertions using assertion API methods from the JUnit framework</span>. There are many different kinds of assertion API methods being defined from the JUnit framework.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3 – Assertions   Quiz: Q1, Q2, Q3
+═══════════════════════════════════════════════ -->
+<div class="section" id="assertions">
+  <div class="section-title">Assertions</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro">static methods defined in <span class="red">org.junit.jupiter.api.Assertions</span></p>
+        <ul>
+          <li><span class="red">static void assertEquals</span> (byte expected, byte actual)</li>
+          <li><span class="red">static void assertEquals</span> (char expected, char actual)</li>
+          <li><span class="red hl-slide">static void assertEquals</span><span class="hl-slide"> (double expected, double actual, double delta)</span>
+            <ul>
+              <li>Asserts that expected and actual are equal within the given delta</li>
+            </ul>
+          </li>
+          <li><span class="red hl-slide">static void assertEquals</span><span class="hl-slide"> (float expected, float actual, float delta)</span>
+            <ul>
+              <li>Asserts that expected and actual are equal within the given delta</li>
+            </ul>
+          </li>
+          <li><span class="red">static void assertEquals</span> (int expected, int actual)</li>
+          <li><span class="red">static void assertEquals</span> (long expected, long actual)</li>
+          <li><span class="red">static void assertEquals</span> (short expected, short actual)</li>
+          <li><span class="red">static void assertEquals</span> (Object expected, Object actual)
+            <ul>
+              <li>Asserts that expected and actual are equal, using <span class="red">equals()</span> method</li>
+            </ul>
+          </li>
+          <li><span class="red hl-slide">static void assertSame</span><span class="hl-slide"> (Object expected, Object actual)</span>
+            <ul>
+              <li>Asserts that expected and actual refer to the same object</li>
+            </ul>
+          </li>
+          <li>…</li>
+        </ul>
+        <p class="cite">(JUnit Assertions, 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>They are in the form of static methods defined in this particular package from the JUnit framework. For different types of values being compared for equality, we have different kinds of assertEquals API methods. For example, for bytes, character, double, float, integer, long, short, and Objects.</p>
+        <p>Let's pay attention to the assertEquals for double and float values. We also have the third argument value delta. <span class="hl-trans">The reason is that if we compare the equality of two double or float values, due to rounding errors, these values may have slight impositions. Therefore, just comparing these two values we may have the conclusion as not being equal.</span> But in fact, we would like to see that they are considered as equal. Therefore, we could use this assertEquals method to assert that the expected and the actual values are equal within the given delta — the allowable difference between the two double or float values.</p>
+        <p>Let us also take a look at the last two methods, assertEquals and assertSame. Both API methods are comparing two objects, but <span class="hl-trans">assertEquals is comparing the expected and actual values to be equal using the equals method being defined on these two objects.</span> Typically, we need to override the equals method being defined on the object class so that we would have some customized equality checking between two objects of a specific class.</p>
+        <p>In contrast, <span class="hl-trans">assertSame is comparing the reference or pointer equality of the two objects. Basically asserting that the expected and the actual objects refer to the same object.</span> There are many more other assertions that we are not listing here. You can refer to the JUnit assertions class for the complete list of the assertions being defined in the JUnit framework.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 1</div>
+        <div class="quiz-q">Which of the following is a valid method signature in JUnit API?</div>
+        <ul class="quiz-options">
+          <li><code>static void assertEquals(byte expected, byte actual, double delta)</code></li>
+          <li class="correct"><code>static void assertEquals(double expected, double actual, double delta)</code></li>
+        </ul>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 2</div>
+        <div class="quiz-q">True or False: If the <code>equals</code> method doesn't get overridden, <code>assertSame</code> and <code>assertEquals</code> work in the same way.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 3</div>
+        <div class="quiz-q">True or False: <code>assertSame</code> asserts that the expected and actual objects refer to the same object.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 4 – assertAll   Quiz: Q4
+═══════════════════════════════════════════════ -->
+<div class="section" id="assertall">
+  <div class="section-title">assertAll</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro"><span class="red">static void assertAll</span>(String heading, Executable… executables)</p>
+        <p class="intro"><span class="hl-slide">Asserts that all supplied executables do not throw exceptions</span></p>
+        <div class="code-block"><span class="kw">@Test</span>
+void groupedAssertions() {
+    <span class="kw">// In a grouped assertion all assertions are executed, and any</span>
+    <span class="kw">// failures will be reported together.</span>
+    assertAll(<span class="st">"person"</span>,
+        () -> assertEquals(<span class="st">"John"</span>, person.getFirstName()),
+        () -> assertEquals(<span class="st">"Doe"</span>, person.getLastName())
+    );
+}</div>
+        <p class="cite">(Bechtold et al., 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>Next, let's take a look at the remaining assertion API methods. First, assertAll. The first argument of assertAll is a heading of a string type to be added in the beginning of the error message of assertion violations being produced by the execution engine of the JUnit framework. And then we have a list of executable code being included as the rest of the arguments of assertAll.</p>
+        <p>These assertAll API methods assert that all supplied executable code do not throw exceptions. <span class="hl-trans">Any of such executable code that throws an exception would not cause other executable code not to be executed.</span> Such situation is in contrast to the normal situations where we list each of such executable code as assertions in the end of a unit test method. In that situation, an earlier assertion being violated will cause a later assertion not to be executed. But here, <span class="hl-trans">all the executable codes will be executed no matter whether one or more of these executable codes will throw exceptions.</span></p>
+        <p>For example, in the test method on the slide, we have "person" string to be added in the beginning of the error message. And then, we have these two assertEquals API method calls being executable code that we can execute to see whether any of such assertEquals throws exceptions. If so, we will add such exception-throwing messages in the final message being produced with a prefix.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 4</div>
+        <div class="quiz-q">True or False: <code>assertAll</code> won't continue checks if one of the assertions does not pass.</div>
+        <div class="quiz-answer"><span class="answer-false">✗ False</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 5 – assertThrows   Quiz: Q5
+═══════════════════════════════════════════════ -->
+<div class="section" id="assertthrows">
+  <div class="section-title">assertThrows</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro"><span class="red">static &lt;T extends Throwable&gt; T assertThrows</span>(<span class="red">Class&lt;T&gt;</span> expectedType, <span class="red">Executable</span> executable)</p>
+        <p class="intro"><span class="hl-slide">Asserts that execution of the supplied executable throws an exception of the expectedType and returns the exception.</span></p>
+        <div class="code-block"><span class="kw">@Test</span>
+void exceptionTesting() {
+    Throwable exception = assertThrows(
+        IllegalArgumentException.class, () -> {
+            throw new IllegalArgumentException(<span class="st">"a message"</span>);
+        });
+    assertEquals(<span class="st">"a message"</span>, exception.getMessage());
+}</div>
+        <p class="cite">(Bechtold et al., 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>The second assertion API method is assertThrows. <span class="hl-trans">This API method allows you to assert that execution of the supplied executable code throws an exception of the expected type as the first argument of this API method. And then, the exception being thrown will be returned as the return value of this API method.</span></p>
+        <p>Let's take a look at the example test method on the slide. We first put the expected exception type as the first argument — IllegalArgumentException. And then for the executable code we simply throw a new IllegalArgumentException. Apparently, this executable code has an exception of the type IllegalArgumentException. Then the exception is returned, being stored in the exception variable. The last statement of this test method is assertEquals. The exception's getMessage method will return the string as a message being equal to the expected result as the first argument of assertEquals.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 5</div>
+        <div class="quiz-q">True or False: <code>assertThrows</code> asserts that execution of the supplied executable throws an exception of the <code>expectedType</code> and returns the exception.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8.7 Writing Parameterized Tests – Study Notes + Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 48px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  header {
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 16px;
+    margin-bottom: 48px;
+  }
+  header .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 6px;
+  }
+  header .label a {
+    color: #666;
+    text-decoration: none;
+  }
+  header .label a:hover {
+    text-decoration: underline;
+  }
+  header h1 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ── Section ── */
+  .section {
+    margin-bottom: 56px;
+    padding-top: 32px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+  }
+
+  /* ── No quiz: same slide/transcript widths as .cols-with-quiz (third column stays empty) ── */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── 3-col when quiz present ── */
+  .cols-with-quiz {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Column label ── */
+  .col-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ebebeb;
+  }
+  .quiz-col .col-label {
+    color: #6b4fb8;
+    border-bottom-color: #c9b8f0;
+  }
+
+  /* ── Slide content ── */
+  .slide-content {
+    padding: 0;
+  }
+  .slide-content ul { list-style: none; padding: 0; }
+  .slide-content ul li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .slide-content ul li::before { content: "•"; position: absolute; left: 0; color: #888; }
+  .slide-content ul ul { margin-top: 4px; margin-left: 12px; }
+  .slide-content ul ul li::before { content: "·"; color: #aaa; }
+  .slide-content .intro { margin-bottom: 10px; font-size: 14px; }
+
+  .red { color: #c0392b; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+  .cite { font-size: 11px; color: #999; text-align: right; margin-top: 10px; font-style: italic; }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    color: #1a1a1a;
+  }
+  .code-block .kw { color: #c0392b; }
+  .code-block .st { color: #2980b9; }
+
+  /* ── Transcript ── */
+  .transcript p {
+    margin-bottom: 12px;
+    font-size: 14.5px;
+    color: #222;
+  }
+
+  /* ══════════════════════════════════════════
+     HIGHLIGHT STYLES — soft background only,
+     no borders, no outlines, no bold
+  ══════════════════════════════════════════ */
+  .hl-slide {
+    background: #fff3b0;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+  .hl-trans {
+    background: #b8e8ff;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* ══════════════════════════════════════════
+     QUIZ STYLES — minimal, no cards/boxes
+  ══════════════════════════════════════════ */
+  .quiz-item {
+    margin-bottom: 22px;
+  }
+  .quiz-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .quiz-num {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 4px;
+  }
+
+  .quiz-q {
+    font-size: 13px;
+    color: #1a1a1a;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .quiz-q code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  .quiz-options {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0 0;
+  }
+  .quiz-options li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 3px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #555;
+  }
+  .quiz-options li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #aaa;
+  }
+  .quiz-options li.correct {
+    color: #1a6b2e;
+  }
+  .quiz-options li.correct::before {
+    color: #1a6b2e;
+  }
+  .quiz-options li.correct::after {
+    content: " ✓";
+    color: #1a6b2e;
+  }
+
+  .quiz-answer {
+    font-size: 13px;
+    color: #1a1a1a;
+  }
+  .answer-true  { color: #1a6b2e; }
+  .answer-false { color: #8b1a1a; }
+
+  @media (max-width: 960px) {
+    .cols-with-quiz, .cols { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Study Notes · Software Testing</div>
+  <h1>8.7 Writing Parameterized Tests</h1>
+  <div style="margin-top:10px; font-size:13px; color:#666;">
+    <a href="index.html" style="color:#666; text-decoration:none;">Notebook Index</a>
+    &nbsp;·&nbsp;
+    <a href="8.6%20Parameterized%20Tests%3A%20Complex%20Parameters.html" style="color:#666; text-decoration:none;">Previous section</a>
+    &nbsp;·&nbsp;
+    <a href="11.1%20Debugging%20Overview.html" style="color:#666; text-decoration:none;">Next section</a>
+  </div>
+</header>
+
+<nav style="margin-bottom: 48px; font-size: 13px; color: #555;">
+  <div class="col-label" style="margin-bottom: 10px;">Contents</div>
+  <ol style="list-style: decimal; padding-left: 20px; line-height: 2.2;">
+    <li><a href="#learning-objectives" style="color: #555;">Learning Objectives</a></li>
+    <li><a href="#separation-of-concerns" style="color: #555;">Separation of Concerns</a></li>
+    <li><a href="#general-4a-pattern" style="color: #555;">General 4A Pattern: Assume, Arrange, Act, Assert</a></li>
+    <li><a href="#buggy-implementation-for-intset" style="color: #555;">(Buggy) Implementation for IntSet</a></li>
+    <li><a href="#parameterized-tests-as-algebraic-specifications" style="color: #555;">Parameterized Tests as Algebraic Specifications</a></li>
+    <li><a href="#some-properties-for-intset" style="color: #555;">Some Properties for IntSet</a></li>
+    <li><a href="#guidelines-for-writing-properties" style="color: #555;">Guidelines for Writing Properties</a></li>
+    <li><a href="#property-first-guideline" style="color: #555;">Property-First Guideline</a></li>
+    <li><a href="#add-more-properties" style="color: #555;">Add More Properties</a></li>
+    <li><a href="#assumption-first-guideline" style="color: #555;">Assumption-First Guideline</a></li>
+  </ol>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1 – Learning Objectives  (no quiz)
+═══════════════════════════════════════════════ -->
+<div id="learning-objectives" class="section">
+  <div class="section-title">Learning Objectives</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro">By the end of this video, you will be able to</p>
+        <ul>
+          <li>Explain the separation of two concerns in writing parameterized tests.</li>
+          <li>Explain the general 4A pattern.</li>
+          <li>Write parameterized tests using the property-first guideline given a class under test.</li>
+          <li>Write parameterized tests using the assumption-first guideline given a class under test.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>This is a lecture video on writing parametrized tests. Being part of the lecture topic of software testing. By the end of this video, you will be able to explain the separation of two concerns in writing parametrized tests. Explain the general 4A pattern. Write parameterized tests using the property-first guideline given a class under test. And write parameterized tests using the assumption-first guideline given a class under test.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2 – Separation of Concerns   Quiz: Q1
+═══════════════════════════════════════════════ -->
+<div id="separation-of-concerns" class="section">
+  <div class="section-title">Separation of Concerns</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro">Parameterized tests enable to separate two concerns:</p>
+        <ul>
+          <li><span class="hl-slide">(1) The specification of external behavior (i.e., assertions)</span></li>
+          <li><span class="hl-slide">(2) The generation/selection of internal test inputs (i.e., coverage)</span></li>
+        </ul>
+        <div class="code-block" style="margin-top: 12px;"><span class="kw">@ParameterizedTest</span>
+<span class="kw">@ValueSource(…)</span>
+void PT1(<span class="kw">int</span> elem, Stack&lt;Integer&gt; stk) {
+    assumeTrue(stk != null);
+    <span class="kw">int</span> oldSize = stk.size();
+    stk.push(elem);
+    assertEquals(oldSize + 1, stk.size());
+}</div>
+        <p class="intro" style="margin-top: 12px;">Besides manually writing test inputs, one can use an <span class="hl-slide">automatic test generation tool</span> to construct a <span class="hl-slide">small test suite with high coverage!</span></p>
+        <ul>
+          <li>E.g., AgitarOne JUnit Generator for Java programs</li>
+          <li>E.g., Parasoft Jtest for Java programs</li>
+          <li>E.g., Microsoft IntelliTest in Visual Studio for .NET programs</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>Writing parameterized tests can enable us to separate two major concerns. First, we specify the external behaviors of the call and the test as parameterized tests than self typically with assertions. A long with the set top of the method sequences along with argument values in order to allow the assertions to be applicable. At the same time, we specify or generate the values for the parameters in the parameter test. As additional external mechanism rather than hard code such values inside the parameter test.</p>
+        <p>So besides we manual write these test inputs as we can see using value source and other annotations. We can also use an <span class="hl-trans">automatic test generation tool to construct a small test with high coverage</span>. As an example, commercial tools for generating values for the primary test. Without requiring the wall post to specify the source of the argument values for the parameters in parameter test. For example, for Java programs, commercial tools. Include AgitarOne JUnit Generator Java and Parasoft Jtest, for .NET programs such as a C# programs. We can use Microsoft IntelliTest which is in the Visual Studio Enterprise edition.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 1</div>
+        <div class="quiz-q">True or False: One can use an automatic test generation tool to construct a small test suite with high coverage.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3 – General 4A Pattern   Quiz: Q2, Q3
+═══════════════════════════════════════════════ -->
+<div id="general-4a-pattern" class="section">
+  <div class="section-title">General 4A Pattern: Assume, Arrange, Act, Assert</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <div class="code-block"><span class="kw">@ParameterizedTest</span>
+<span class="kw">@ValueSource(…)</span>
+void PT1(<span class="kw">int</span> elem, Stack&lt;Integer&gt; stk) {
+    <span class="hl-slide">assumeTrue(stk != null);</span>      <span style="color:#888">← Assume</span>
+    <span class="hl-slide">int oldSize = stk.size();</span>     <span style="color:#888">← Arrange</span>
+    stk.push(elem);                       <span style="color:#888">← Act</span>
+    assertEquals(oldSize + 1, stk.size()); <span style="color:#888">← Assert</span>
+}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>When writing parameter test, the workers can follow such general <span class="hl-trans">4A pattern assume, arrange, act, and assert</span>. In the beginning of the primary test, we can put down some assumptions to make sure that argument values being passed in must certify certain predicates. Basically filtering out those invalid or illegal argument values being passed in for this parameter test.</p>
+        <p>And then we have arrangement sometimes for bringing objects under test to a specific state or caching some values that later on we will use in the assertions. In this example, we have such arrangement to cache the values of the old size. And then we have act, basically, invoking the measure in the test. And finally, we have assert, for asserting the behavior of the core under test, would be as expected. Sometimes the assertions may also use some cache values such as oldSize is being stored in arrangement portion of the primary test.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 2</div>
+        <div class="quiz-q">Which of the following refers to line 4 <code>assumeTrue(stk != null);</code>?</div>
+        <ul class="quiz-options">
+          <li class="correct">Assume</li>
+          <li>Arrange</li>
+          <li>Act</li>
+          <li>Assert</li>
+        </ul>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 3</div>
+        <div class="quiz-q">Which of the following refers to line 6 <code>stk.push(elem);</code>?</div>
+        <ul class="quiz-options">
+          <li>Assume</li>
+          <li>Arrange</li>
+          <li class="correct">Act</li>
+          <li>Assert</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 4 – (Buggy) Implementation for IntSet  (no quiz)
+═══════════════════════════════════════════════ -->
+<div id="buggy-implementation-for-intset" class="section">
+  <div class="section-title">(Buggy) Implementation for IntSet</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <div class="code-block">class IntSet {
+    public IntSet() {…};
+    public void insert(<span class="kw">int</span> e) { … }
+    public Bool member(<span class="kw">int</span> e) { … }
+    public void remove(<span class="kw">int</span> e) { … }
+    public boolean equals(IntSet o) { … }
+}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>To illustrate how we can write primary test for a class under test, let's use integer set, int set. Class as implementation of class set with integer elements with constructor and inserting an elements into the set. And checking whether a particular integer is a member of a set, removing an element from the set, and checking whether two objects of the integer sets are equal. Basically, checking whether the elements of these two sets are the same without considering the order of the elements or the duplicate elements of the and each unique element in these two sets.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 5 – Parameterized Tests as Algebraic Specifications  (no quiz)
+═══════════════════════════════════════════════ -->
+<div id="parameterized-tests-as-algebraic-specifications" class="section">
+  <div class="section-title">Parameterized Tests as Algebraic Specifications</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li>Universally quantified, conditional property (<span class="hl-slide">axiom</span>)</li>
+        </ul>
+        <div class="code-block" style="margin-top: 10px;">∀ int i, int j, IntSet s:
+s != null &amp;&amp; i == j ⇒
+remove(insert(s, j).state, i).state = remove(s, i).state</div>
+        <div class="code-block" style="margin-top: 8px;">∀ int i, int j, IntSet s1, IntSet s2:
+s != null &amp;&amp; i == j &amp;&amp; s1.equals(s2) ⇒
+remove(insert(s1, j).state, i).state.equals(remove(s2, i).state)</div>
+        <p class="intro" style="margin-top: 10px; font-size: 13px; color: #555;">First argument is the receiver object<br>
+The resulting receiver object state of m as <span class="red">m.state</span><br>
+The return of m as <span class="red">m.ret</span></p>
+        <div class="code-block" style="margin-top: 10px;">void PUTSet1(<span class="kw">int</span> i, <span class="kw">int</span> j, IntSet s1, IntSet s2) {
+    assumeTrue(s != null &amp;&amp; i == j &amp;&amp; s1.equals(s2));
+    s1.insert(j);
+    s1.remove(i);
+    s2.remove(i);
+    assertEquals(s1.equals(s2));
+}</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>When writing parameter test, the workers can cheat writing such test, as writing eligible specifications, type or the form of specifications such specifications are in the form of <span class="hl-trans">axiom</span>. Basically equation or in equation among the return values of the method calls or the resulting object state of the method calls being defined on the interface of the class and the test. In order to read such properties, we first need to define sequence how to read a method call expression in such properties specification. We specify this first argument of the method call to the receiver object. Such as the first argument for remove here. And then we put the actual, the real argument for the method call of the remaining argument such as i for remove as a second argument. And then we refer to the resulting receiver object state of a method call as <span class="hl-trans">n.state</span> for a method call n.</p>
+        <p>For example, here, we basically use the resulting object state after we invoke insert on the given s object state, upon using the argument of j as insert's argument. We also use opposefix.iet to indicate the return value of a measure n. Next, we can see an example property being specified. Basically, we are saying for each integer i and integer j along with integer set s object as long as s is not null pointer and i is equal to j, then we have such equation. The left hand side of the equation would be invoking insert on the receiver object state s with the argument j for insert. And then we had the resulting object state of the receive object state of the insert. And then we use that receiver object state of remove, and we invoke remove with the value i. And finally, we get the resulting receiver object state after invoking the remove method. On the right hand side, we invoke remove with the argument i on the receiver object s. And then we use a result in receiver object state after invoking remove. And these two result in object states would be equal.</p>
+        <p>In order to translate such formula to be close to executable code, we make a tool multiplications. First, instead of using this equals, we use the actual method call equals been define on the interface of a integer set to compare the left-hand side resulting obviously on right-hand side. In addition, given that left-hand side we use s, right-hand side, we also use s. It's not quite the same s anymore, if we invoke a bunch of methods. On the received object as on the left-hand side before we use it on the right hand side. Therefore, we introduce two objects s1, s2 instead of just S. At the same time, we add s1 equals S2, as a part of the conditions in the beginning, so that we know these two objects have the same state. After we convert the accent, the formula to the middle part of the code snippets close to the executable code. We can further convert the code snippet into our actual parameters test. In particular, we convert this variables to be parameters of the parameter test and the conditions part to be assumption. We've seen the beginning of the parameter test and then the equation would be converted to the middle parts along with assertions in the end of the parameters test. Basically, the equation is converted to the act and assert part of the primary test.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 6 – Some Properties for IntSet  (no quiz)
+═══════════════════════════════════════════════ -->
+<div id="some-properties-for-intset" class="section">
+  <div class="section-title">Some Properties for IntSet</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro">Properties (axioms)</p>
+        <div class="code-block">∀ int i, int j, IntSet s:
+s != null ⇒
+member(IntSet().ret, i).ret = false &amp;&amp;
+member(insert(s, j).state, i).ret =
+    if i = j then true
+    else member(s, i).ret</div>
+        <p class="cite">(Stotts et al., 2002)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>Then we can specify some properties for our class and test integer set. Here is one concrete example of such equations with a little bit more complicated conditions within the equation. Such as if i = j then you have the right-hand side to be true. Otherwise, you have to the return value of these member method call being on the right-hand side. Being equivalent to the or being equal to the left-hand sides return value. Here, I just leave it as a brain exercise for you to figure out why we have these two equality properties for our integer set.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 7 – Guidelines for Writing Properties  (no quiz)
+═══════════════════════════════════════════════ -->
+<div id="guidelines-for-writing-properties" class="section">
+  <div class="section-title">Guidelines for Writing Properties</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li><span class="hl-slide">Property First (Assumption Second)</span></li>
+          <li><span class="hl-slide">Assumption First (Property Second)</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>We have two major guidelines for you to use to write properties in the form of a parameter test. First, we have this property first assumption second guideline. And then second, we have these assumption first, but property second guidelines.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 8 – Property-First Guideline   Quiz: Q4
+═══════════════════════════════════════════════ -->
+<div id="property-first-guideline" class="section">
+  <div class="section-title">Property-First Guideline</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li>Step 1. Classify methods to be
+            <ul>
+              <li><span class="hl-slide">modifiers</span>: IntSet constructor, insert, remove while modifying/constructing states</li>
+              <li><span class="hl-slide">observers</span>: returning some other value w/o modifying states</li>
+            </ul>
+          </li>
+          <li>Step 2. <span class="hl-slide">Pairwise-combine</span> them to formulate properties
+            <ul>
+              <li>Every observer o is paired with a modifier</li>
+              <li>Every modifier m is paired with another modifier (including m itself)</li>
+            </ul>
+          </li>
+          <li>Step 3. Add proper <span class="hl-slide">assumptions</span> to make the properties (e.g., equality, inequality) true</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>Next, let me illustrate each of these guidelines one by one. In the property first guidelines, in the first step. We need to classify those methods being defined on the interface of the class and the test to be two major types. First, is <span class="hl-trans">modifiers</span>, being those methods that can actually can modify the state of the receive object. Including the constructor method call, along with inset remove because these methods can modify the states of the integer set objects. Then we also classify the remaining ones to be <span class="hl-trans">observers</span>. Being those that typically do not modify the receiver object stays, but can return some values to indicate the return type or inspecting the states of receiver objects.</p>
+        <p>By the way, this method should be public methods defined on the class and the test. And we don't concern about those private methods or non-private methods that we are not testing from the interface of the class and the test. In step two, we need to enumerate and those different <span class="hl-trans">pairwise combinations</span> of these methods to formulate properties. For example, each observer o is paired with a modifier and each modifier m is paired with another modifier including m itself. Then in step three, after we pair them up, basically when we say we pair one methods after another. We basically invoke one method and then invoke another method after debt. In step three, we at proper assumptions in the beginning of such pair combination of the method cost. So we can think about what kind of properties, what kind of assertions especially in terms of equality or inequality for us to specify the intended behaviors.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 4</div>
+        <div class="quiz-q">Which of the following does NOT belong to the Property-First Guideline?</div>
+        <ul class="quiz-options">
+          <li>Classify methods</li>
+          <li>Pairwise-combine methods to formulate properties</li>
+          <li class="correct">Formulate properties specific to each feasible combination of observers' returns as assumptions</li>
+          <li>Add proper assumptions to make the properties</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 9 – Add More Properties  (no quiz)
+═══════════════════════════════════════════════ -->
+<div id="add-more-properties" class="section">
+  <div class="section-title">Add More Properties</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <div class="code-block">∀ int i, int j, IntSet s:
+s != null ⇒
+member(IntSet().ret, i).ret = false &amp;&amp;
+member(insert(s, j).state, i).ret =
+    if i = j then true
+    else member(s, i).ret &amp;&amp;
+remove(IntSet().ret, i).state = IntSet().ret &amp;&amp;
+remove(insert(s, j), i).state =
+    if i = j then remove(s, i).state
+    else insert(remove(s, i), j).state &amp;&amp;
+insert(insert(s, i), j) = insert(insert(s, j), i) &amp;&amp;
+insert(insert(s, i), i) = insert(s, i)
+...</div>
+        <p class="cite">(Stotts et al., 2002)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>Here's an example of the pairs like the first one. So I could construct the core and member, and then insert a member. And construct a call, and remove, insert, remove, insert, insert, and insert, insert. So now, we can enumerate these kind of like a pair of the method calls. And think about what kind of like equation or inequations that we could formulate on the right-hand side. In terms of checking the equality or inequality of the return values or this resulting object state. The receiver object state from the left-hand side.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 10 – Assumption-First Guideline  (no quiz)
+═══════════════════════════════════════════════ -->
+<div id="assumption-first-guideline" class="section">
+  <div class="section-title">Assumption-First Guideline</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li>Step 1: <span class="hl-slide">All-combine possible returns of observers</span>, e.g.,
+            <ul>
+              <li>!member(i)</li>
+              <li>member(i)</li>
+              <li>isEmpty()</li>
+              <li>!isEmpty()</li>
+              <li>!member(i) &amp;&amp; isEmpty()</li>
+              <li>member(i) &amp;&amp; isEmpty()</li>
+              <li>!member(i) &amp;&amp; !isEmpty()</li>
+              <li>member(i) &amp;&amp; !IsEmpty()</li>
+              <li>true</li>
+            </ul>
+          </li>
+          <li>Step 2: Formulate properties <em>specific</em> under each feasible combination as assumption
+            <ul>
+              <li>then follow the <span class="hl-slide">property-first guideline</span> under such assumption</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>Next, let's a look at Assumption-First Guideline. In the first step, we combine all possible returns of these observers that we can get from the interface of the class and the test. For our integer set, we can see we have member, and it's empty. Also the two main observer method, here, we intentionally not to put equals as one of the observers. Because typically, we use equals to compare the equality or equivalence of objects states. Then for these two observers, we can try combination of different value.</p>
+        <p>Such as for particular integer argument i, where there is a member of the set, or is not member and is empty or is not empty. And even the combinations of isEmpty and isMember. Or in the end, we basically don't impose any kind of constraints in terms of the receiver states of the class and the task. Then in step two, for each of such combinations of the returns, of observers including two. We formulate those properties that would be true under such conditions, by adding those additional combinations also assumption besides the one that we already observe. Then we can further follow the property first guidelines to continue the remaining process for formulating those properties that we would like to C being satisfied by the core under test.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

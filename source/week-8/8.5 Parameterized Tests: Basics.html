@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8.5 Parameterized Tests: Basics – Study Notes + Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 48px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  header {
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 16px;
+    margin-bottom: 48px;
+  }
+  header .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ── Section ── */
+  .section {
+    margin-bottom: 56px;
+    padding-top: 32px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+  }
+
+  /* ── No quiz: same slide/transcript widths as .cols-with-quiz (third column stays empty) ── */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── 3-col when quiz present ── */
+  .cols-with-quiz {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Column label ── */
+  .col-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ebebeb;
+  }
+  .quiz-col .col-label {
+    color: #6b4fb8;
+    border-bottom-color: #c9b8f0;
+  }
+
+  /* ── Slide content ── */
+  .slide-content {
+    padding: 0;
+  }
+  .slide-content ul { list-style: none; padding: 0; }
+  .slide-content ul li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .slide-content ul li::before { content: "•"; position: absolute; left: 0; color: #888; }
+  .slide-content ul ul { margin-top: 4px; margin-left: 12px; }
+  .slide-content ul ul li::before { content: "·"; color: #aaa; }
+  .slide-content .intro { margin-bottom: 10px; font-size: 14px; }
+
+  .red { color: #c0392b; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+  .cite { font-size: 11px; color: #999; text-align: right; margin-top: 10px; font-style: italic; }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    color: #1a1a1a;
+  }
+  .code-block .kw { color: #c0392b; }
+  .code-block .st { color: #2980b9; }
+
+  /* ── Transcript ── */
+  .transcript p {
+    margin-bottom: 12px;
+    font-size: 14.5px;
+    color: #222;
+  }
+
+  /* ══════════════════════════════════════════
+     HIGHLIGHT STYLES — soft background only,
+     no borders, no outlines, no bold
+  ══════════════════════════════════════════ */
+  .hl-slide {
+    background: #fff3b0;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+  .hl-trans {
+    background: #b8e8ff;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* ══════════════════════════════════════════
+     QUIZ STYLES — minimal, no cards/boxes
+  ══════════════════════════════════════════ */
+  .quiz-item {
+    margin-bottom: 22px;
+  }
+  .quiz-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .quiz-num {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 4px;
+  }
+
+  .quiz-q {
+    font-size: 13px;
+    color: #1a1a1a;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .quiz-q code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  .quiz-options {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0 0;
+  }
+  .quiz-options li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 3px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #555;
+  }
+  .quiz-options li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #aaa;
+  }
+  .quiz-options li.correct {
+    color: #1a6b2e;
+  }
+  .quiz-options li.correct::before {
+    color: #1a6b2e;
+  }
+  .quiz-options li.correct::after {
+    content: " ✓";
+    color: #1a6b2e;
+  }
+
+  .quiz-answer {
+    font-size: 13px;
+    color: #1a1a1a;
+  }
+  .answer-true  { color: #1a6b2e; }
+  .answer-false { color: #8b1a1a; }
+
+  @media (max-width: 960px) {
+    .cols-with-quiz, .cols { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Study Notes · Software Testing</div>
+  <h1>8.5 Parameterized Tests: Basics</h1>
+  <div style="margin-top:10px; font-size:13px; color:#666;">
+    <a href="index.html" style="color:#666; text-decoration:none;">Notebook Index</a>
+    &nbsp;·&nbsp;
+    <a href="8.3%20JUnit%3A%20Assertions.html" style="color:#666; text-decoration:none;">Previous section</a>
+    &nbsp;·&nbsp;
+    <a href="8.6%20Parameterized%20Tests%3A%20Complex%20Parameters.html" style="color:#666; text-decoration:none;">Next section</a>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1 – Learning Objectives  (no quiz)
+═══════════════════════════════════════════════ -->
+<div class="section" id="learning-objectives">
+  <div class="section-title">Learning Objectives</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro">By the end of this video, you will be able to</p>
+        <ul>
+          <li>Explain the difference between a parameterized test and a conventional test.</li>
+          <li>Explain the differences among using <span class="red">ValueSource</span>, <span class="red">EnumSource</span>, <span class="red">MethodSource</span>, <span class="red">CsvSource</span>, <span class="red">CsvFileSource</span>, and <span class="red">ArgumentsSource</span>.</li>
+          <li>Write parameterized tests using <span class="red">ValueSource</span>, <span class="red">EnumSource</span>, <span class="red">MethodSource</span>, <span class="red">CsvSource</span>, <span class="red">CsvFileSource</span>, and <span class="red">ArgumentsSource</span> respectively.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>This is a lecture video on Parameterized Tests: Basics, being part of the lecture topic of Software Testing. By the end of this video, you will be able to explain the difference between a parameterized test and a conventional test, explain the differences among using ValueSource, EnumSource, MethodSource, CsvSource, CsvFileSource, and ArgumentsSource, and write parameterized tests using ValueSource, EnumSource, MethodSource, CsvSource, CsvFileSource, and ArgumentsSource respectively.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2 – Parameterized Test   Quiz: Q1, Q2, Q3
+═══════════════════════════════════════════════ -->
+<div class="section" id="parameterized-test">
+  <div class="section-title">Parameterized Test</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li>Must declare at least one <em>source</em> that provides arguments for each invocation of the parameterized test, e.g.,
+            <ul>
+              <li><span class="red hl-slide">@ValueSource</span>
+                <ul>
+                  <li>Argument of short, byte, int, long, float, double, char, java.lang.String, or java.lang.Class</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <div class="code-block" style="margin-top:12px;"><span class="kw hl-slide">@ParameterizedTest</span>
+<span class="kw hl-slide">@ValueSource</span>(strings = { <span class="st">"racecar"</span>, <span class="st">"radar"</span>, <span class="st">"able was I ere I saw elba"</span> })
+<span class="kw">void</span> palindromes(<span class="kw">String</span> candidate) {
+    assertTrue(isPalindrome(candidate));
+}</div>
+        <p style="font-size:12px; color:#c0392b; font-family:'IBM Plex Mono',monospace; margin-top:10px;">ConsoleLauncher will print output as below</p>
+        <div class="code-block" style="margin-top:6px; font-size:12px;">palindromes(String) ✔
+├─ [1] racecar ✔
+├─ [2] radar ✔
+└─ [3] able was I ere I saw elba ✔</div>
+        <p class="cite">(Bechtold et al., 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p><span class="hl-trans">A parameterized test is a unit test with parameters, unlike conventional unit tests which do not have parameters for the unit test methods.</span> In this example, we use ValueSource as a way for providing arguments of specific types such as a short byte integer, long flow the double, characters, string or generally class. In our example, we supply three string values one-by-one for us to invoke the parameters tests. After we use the execution engine of the unit test to run such parameter tests which the supplied source of the argument values, we can have three concrete conventional unit tests being produced, with each of them corresponding to the argument values being listed from the ValueSource. Besides using the ValueSource to supply argument values for those premium type argument values for the parameter test, we can also use EnumSource for the arguments of enumerate type of the parameters tests.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 1</div>
+        <div class="quiz-q">What are Parameterized tests used for in JUnit?</div>
+        <div class="quiz-answer"><span class="answer-true">✓ Run a test many times with different sets of parameters</span></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 2</div>
+        <div class="quiz-q">Which annotation must a parameterized test class carry?</div>
+        <div class="quiz-answer"><span class="answer-true">✓ @ParameterizedTest</span></div>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 3</div>
+        <div class="quiz-q">Which annotation allows you to supply a simple array of literal values (e.g., int, String, double) directly to a parameterized test?</div>
+        <div class="quiz-answer"><span class="answer-true">✓ @ValueSource</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3 – Other Sources of Arguments: EnumSource   Quiz: Q4
+═══════════════════════════════════════════════ -->
+<div class="section" id="other-sources-of-arguments-enumsource">
+  <div class="section-title">Other Sources of Arguments: EnumSource</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li><span class="red">@EnumSource</span>
+            <ul>
+              <li>Argument of Enum Type</li>
+            </ul>
+          </li>
+        </ul>
+        <div class="code-block" style="margin-top:12px;"><span class="kw">@ParameterizedTest</span>
+<span class="kw">@EnumSource</span>(value = <span class="kw">TimeUnit</span>.class, <span class="hl-slide">names = { <span class="st">"DAYS"</span>, <span class="st">"HOURS"</span> }</span>)
+<span class="kw">void</span> testWithEnumSourceInclude(<span class="kw">TimeUnit</span> timeUnit) {
+    assertTrue(EnumSet.of(<span class="kw">TimeUnit</span>.DAYS, <span class="kw">TimeUnit</span>.HOURS).contains(timeUnit));
+}</div>
+        <p class="cite">(Bechtold et al., 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>For our example, we have the enumerate type TimeUnit for the parameter test, then we can specify the argument values using the EnumSource with the value as TimeUnit.class, and then using <span class="hl-trans">the concrete names of the constants being defined on the TimeUnit class as days and hours</span>. Then when we execute these parameter test with the supplied argument values. We parse in two different argument values with the enumerate type constant.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 4</div>
+        <div class="quiz-q">True or False: If we want only specific values from the Enum, we can do that using <code>@EnumSource</code> name parameter.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 4 – Other Sources of Arguments: MethodSource   Quiz: Q5
+═══════════════════════════════════════════════ -->
+<div class="section" id="other-sources-of-arguments-methodsource">
+  <div class="section-title">Other Sources of Arguments: MethodSource</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li><span class="red">@MethodSource</span>
+            <ul>
+              <li>One or more factory methods of the test class or external classes</li>
+            </ul>
+          </li>
+        </ul>
+        <div class="code-block" style="margin-top:12px;"><span class="kw">@ParameterizedTest</span>
+<span class="kw">@MethodSource</span>(<span class="st">"stringProvider"</span>)
+<span class="kw">void</span> testWithSimpleMethodSource(<span class="kw">String</span> argument) {
+    assertNotNull(argument);
+}
+<span class="kw">@ParameterizedTest</span>
+
+<span class="kw hl-slide">static</span> Stream&lt;String&gt; stringProvider() {
+    <span class="kw">return</span> Stream.of(<span class="st">"foo"</span>, <span class="st">"bar"</span>);
+}</div>
+        <p style="font-size:12px; color:#555; font-family:'IBM Plex Mono',monospace; margin-top:8px;">Streams for primitive types (<span style="color:#2980b9;">DoubleStream</span>, <span style="color:#2980b9;">IntStream</span>, and <span style="color:#2980b9;">LongStream</span>)</p>
+        <ul style="margin-top:14px;">
+          <li><span class="red">@MethodSource</span>: multiple parameters</li>
+        </ul>
+        <div class="code-block" style="margin-top:8px; font-size:11.5px;"><span class="kw">@ParameterizedTest</span>
+<span class="kw">@MethodSource</span>(<span class="st">"stringIntAndListProvider"</span>)
+<span class="kw">void</span> testWithMultiArgMethodSource(<span class="kw">String</span> str, <span class="kw">int</span> num, List&lt;String&gt; list) {
+    assertEquals(3, str.length());
+    assertTrue(num &gt;=1 &amp;&amp; num &lt;=2);
+    assertEquals(2, list.size());
+}
+
+<span class="kw hl-slide">static</span> Stream&lt;Arguments&gt; stringIntAndListProvider() {
+    <span class="kw">return</span> Stream.of(
+            arguments(<span class="st">"foo"</span>, 1, Arrays.asList(<span class="st">"a"</span>, <span class="st">"b"</span>)),
+            arguments(<span class="st">"bar"</span>, 2, Arrays.asList(<span class="st">"x"</span>, <span class="st">"y"</span>))
+    );
+}</div>
+        <ul style="margin-top:14px;">
+          <li><span class="red">@MethodSource</span>: external, <span class="hl-slide">static</span> factory method (fully qualified method name)</li>
+        </ul>
+        <div class="code-block" style="margin-top:8px; font-size:11.5px;"><span class="kw">package</span> example;
+<span class="kw">import</span> java.util.stream.Stream;
+<span class="kw">import</span> org.junit.jupiter.params.ParameterizedTest;
+<span class="kw">import</span> org.junit.jupiter.params.provider.MethodSource;
+
+<span class="kw">class</span> ExternalMethodSourceDemo {
+    <span class="kw">@ParameterizedTest</span>
+    <span class="kw">@MethodSource</span>(<span class="st">"example.StringsProviders#tinyStrings"</span>)
+    <span class="kw">void</span> testWithExternalMethodSource(<span class="kw">String</span> tinyString) {
+        <span style="color:#888">// test with tiny string</span>
+    }
+}
+
+<span class="kw">class</span> StringsProviders {
+    <span class="kw hl-slide">static</span> Stream&lt;String&gt; tinyStrings() {
+        <span class="kw">return</span> Stream.of(<span class="st">"."</span>, <span class="st">"oo"</span>, <span class="st">"OOO"</span>);
+    }
+}</div>
+        <p class="cite">(Bechtold et al., 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>We can also use MethodSource, to specify one or more factory methods, of the test class or an external class, in order to supply argument values for the parameter tests. For our example, we specify stringProvider as the name of the factory method that we are going to use. Then the execution engine we search the test class for search tests factory method matching the specified string of the method name. These factory method return stream of two string values.</p>
+        <p>By default the stream would indicate the lease of the strings, such as a foo and bar. We can also define some other stream types for other primitive types such as a double, integer and long, as a return type of the factory methods that we are going to specify for the parameter tests. So far we have shown the examples of parameters test with a single parameter. Of course, we can also specify multiple parameters for a parameters test. In such situations, we can use return type for the factory measure a stream of arguments. For our example, here we specify the three argument values for the three parameters of the parameters tests, and then we use arguments to encapsulate all these three elements together as one of the elements being returned in the stream, being fed as argument values for the parameters tests. Using the MethodSource to specify the factory method, we can also put down fully qualified method name such as the patch name, class name, and the method name for the factory methods <span class="hl-trans">being defined as external static factory method</span>.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 5</div>
+        <div class="quiz-q">True or False: We can use <code>@MethodSource</code> to specify a factory method for test arguments. The factory method should be static.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 5 – Other Sources of Arguments: CsvSource  (no quiz)
+═══════════════════════════════════════════════ -->
+<div class="section" id="other-sources-of-arguments-csvsource">
+  <div class="section-title">Other Sources of Arguments: CsvSource</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li><span class="red">@CsvSource</span>: comma-separated values (i.e., <span class="red">String</span> literals)</li>
+        </ul>
+        <div class="code-block" style="margin-top:12px;"><span class="kw">@ParameterizedTest</span>
+<span class="kw">@CsvSource</span>({ <span class="st">"foo, 1"</span>, <span class="st">"bar, 2"</span>, <span class="st">"'baz, qux', 3"</span> })
+<span class="kw">void</span> testWithCsvSource(<span class="kw">String</span> first, <span class="kw">int</span> second) {
+    assertNotNull(first);
+    assertNotEquals(0, second);
+}</div>
+        <p class="cite">(Bechtold et al., 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>We can also use CsvSource to specify a list of string literals separated by commas. As example here, for the two parameters of the parameter test, one string the other as integer, we can specify three pairs of the values for us to specify with CsvSource. So that we have these implicit conversion from the string values as one, two, three, being converted to the integer type during the execution of the parameterized test with such argument values. Note that, here we use <span class="hl-trans">a single quotation mark to indicate the quote characters in stream</span>.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 6 – Other Sources of Arguments: CsvFileSource  (no quiz)
+═══════════════════════════════════════════════ -->
+<div class="section" id="other-sources-of-arguments-csvfilesource">
+  <div class="section-title">Other Sources of Arguments: CsvFileSource</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li><span class="red">@CsvFileSource</span>: CSV files from the classpath (each line results in one invocation of the parameterized test)</li>
+        </ul>
+        <div class="code-block" style="margin-top:12px;"><span class="kw">@ParameterizedTest</span>
+<span class="kw">@CsvFileSource</span>(resources = <span class="st">"/two-column.csv"</span>, numLinesToSkip = 1)
+<span class="kw">void</span> testWithCsvFileSource(<span class="kw">String</span> first, <span class="kw">int</span> second) {
+    assertNotNull(first);
+    assertNotEquals(0, second);
+}</div>
+        <p style="font-size:12px; color:#555; margin-top:10px; margin-bottom:4px;">two-column.csv</p>
+        <div class="code-block" style="font-size:12px;">Country, reference
+Sweden, 1
+Poland, 2
+"United States of America", 3</div>
+        <p style="font-size:11px; color:#555; margin-top:6px; font-style:italic;">Using a double quote " as the quote character</p>
+        <p class="cite">(Bechtold et al., 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>We can also use CsvFileSource to specify the name of the csv file from the class path. Here is example of the csv file with the name as a two column. Then we can specify CsvFileSource with the resources being the file name. In addition, we also specify the number lines to skip as one, because for our csv file the first line indicates the header of the data in the csv file. We should skip this first row or first line, when we read the lines from the csv file as one line being one list of the arguments being fed to the parameters of the parameters test. As you can see, we have three lines, starting from the second line, each line of these three lines will be used as the argument values for invoking this parameters tests. Note that, here within the csv file, we use <span class="hl-trans">double quotation mark to indicate the quote characters</span>.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 7 – Other Sources of Arguments: ArgumentsSource  (no quiz)
+═══════════════════════════════════════════════ -->
+<div class="section" id="other-sources-of-arguments-argumentssource">
+  <div class="section-title">Other Sources of Arguments: ArgumentsSource</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li><span class="red">@ArgumentsSource</span>: a custom, reusable <span class="red hl-slide">ArgumentsProvider</span> (declared as top-level class or as static nested class)</li>
+        </ul>
+        <div class="code-block" style="margin-top:12px; font-size:11.5px;"><span class="kw">@ParameterizedTest</span>
+<span class="kw">@ArgumentsSource</span>(MyArgumentsProvider.class)
+<span class="kw">void</span> testWithArgumentsSource(<span class="kw">String</span> argument) {
+    assertNotNull(argument);
+}
+
+<span class="kw">public class</span> MyArgumentsProvider <span class="kw">implements</span> ArgumentsProvider {
+  <span class="kw">@Override</span>
+  <span class="kw">public</span> Stream&lt;? extends Arguments&gt; provideArguments(ExtensionContext context) {
+    <span class="kw">return</span> Stream.of(<span class="st">"foo"</span>, <span class="st">"bar"</span>).map(Arguments::of);
+  }
+}</div>
+        <p class="cite">(Bechtold et al., 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>You can also use ArgumentsSource to specify a custom reducible arguments provider class, being declared as a top level class or as a static nested class. For our example, we declare MyArgumentsProvider as the class name to supply factory methods for being used with these parameterized test. Then the execution engine, will look for applicable public method defined on these MyArgumentsProvider, with the return type as applicable on the parameters of the parameters test.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

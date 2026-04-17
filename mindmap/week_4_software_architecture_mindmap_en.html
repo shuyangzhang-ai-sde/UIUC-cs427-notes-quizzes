@@ -319,6 +319,8 @@ function collectAll(node, nodes = [], edges = []) {
 ═══════════════════════════════════════════ */
 const svg = document.getElementById('svg');
 let vx = 0, vy = 0, sc = 1;
+/** Neutral stroke for block outlines (not theme-colored) */
+const BLOCK_STROKE = '#e4e2dc';
 
 function hexForVar(v) {
   // resolve CSS var to actual color for SVG stroke
@@ -402,7 +404,7 @@ function renderTree() {
       const tick = makeEl('line', {
         x1: node.x - w/2 - 2, y1: node.y,
         x2: node.x - w/2 + 3, y2: node.y,
-        stroke: color, 'stroke-width': '2', opacity: '0.6'
+        stroke: BLOCK_STROKE, 'stroke-width': '2', opacity: '0.75'
       });
       ng.appendChild(tick);
       const t = makeEl('text', {
@@ -424,9 +426,8 @@ function renderTree() {
         width: w, height: h,
         rx: rx_val, ry: rx_val,
         fill: light,
-        stroke: color,
+        stroke: 'none',
         'stroke-width': isBranch ? '2' : '1.5',
-        filter: 'url(#sh)',
       });
       ng.appendChild(rect);
 

@@ -12,7 +12,6 @@
   --paper:#fffefb;
   --text:#1a1814;
   --muted:#5c5850;
-  --line:#c4bdb0;
   --c1:#1e4d3a; --c2:#1a5580; --c3:#6b4423;
   --c4:#5c3d6e; --c5:#2f6b7a; --c6:#8b3a3a;
 }
@@ -21,13 +20,13 @@ body{
   background:var(--bg);
   color:var(--text);
   min-height:100vh;
-  padding:28px 14px 40px;
+  padding:28px 16px 40px;
 }
-.map-wrap{max-width:1080px;margin:0 auto;}
-.map-head{text-align:center;margin-bottom:16px;}
+.map-wrap{max-width:720px;margin:0 auto;}
+.map-head{text-align:center;margin-bottom:22px;}
 .map-head h1{
   font-family:'DM Serif Display',serif;
-  font-size:clamp(1.2rem,2.4vw,1.6rem);
+  font-size:clamp(1.2rem,2.4vw,1.55rem);
   font-weight:600;
   letter-spacing:-0.02em;
 }
@@ -40,70 +39,16 @@ body{
   margin-top:6px;
 }
 
-/* Radial mind map */
-.stage{
-  position:relative;
-  width:100%;
-  max-width:760px;
-  aspect-ratio:1;
-  min-height:520px;
-  margin:0 auto;
-}
-.stage-svg{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  pointer-events:none;
-}
-.stage-svg path{
-  fill:none;
-  stroke:var(--line);
-  stroke-width:0.35;
-  vector-effect:non-scaling-stroke;
-}
-.hub{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width:clamp(150px,36%,190px);
-  aspect-ratio:1;
-  border-radius:50%;
-  background:var(--text);
-  color:var(--paper);
+.block-list{
   display:flex;
   flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:14px;
-  z-index:2;
-  box-shadow:0 14px 36px rgba(26,24,20,0.14);
+  gap:14px;
 }
-.hub-k{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.16em;text-transform:uppercase;opacity:0.8;margin-bottom:6px;}
-.hub-t{font-family:'DM Serif Display',serif;font-size:clamp(1rem,2.4vw,1.2rem);line-height:1.2;font-weight:600;}
-.hub-s{font-size:0.72rem;opacity:0.9;margin-top:8px;line-height:1.45;font-weight:500;}
-
-.spokes{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-}
-.spoke{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:min(42vw,220px);
-  pointer-events:auto;
-  /* rotate outward, push to rim, counter-rotate so text stays horizontal */
-  transform:translate(-50%,-50%) rotate(var(--a)) translateY(calc(-1 * min(34vw,255px))) rotate(calc(-1 * var(--a)));
-}
-.spoke-card{
+.block{
   background:var(--paper);
   border-radius:12px;
-  padding:11px 13px 13px;
-  box-shadow:0 6px 24px rgba(26,24,20,0.07);
+  padding:14px 16px 16px;
+  border:none;
 }
 .tag{
   font-family:'DM Mono',monospace;
@@ -111,28 +56,28 @@ body{
   font-weight:600;
   letter-spacing:0.11em;
   text-transform:uppercase;
-  margin-bottom:7px;
+  margin-bottom:8px;
 }
 .tag.t1{color:var(--c1);} .tag.t2{color:var(--c2);} .tag.t3{color:var(--c3);}
 .tag.t4{color:var(--c4);} .tag.t5{color:var(--c5);} .tag.t6{color:var(--c6);}
-.spoke-card h2{
+.block h2{
   font-family:'DM Serif Display',serif;
-  font-size:0.88rem;
+  font-size:1.05rem;
   font-weight:600;
   line-height:1.3;
-  margin-bottom:7px;
+  margin-bottom:8px;
 }
-.spoke-card ul{
+.block ul{
   list-style:none;
-  font-size:0.72rem;
-  line-height:1.48;
+  font-size:0.875rem;
+  line-height:1.5;
   color:var(--muted);
 }
-.spoke-card li{
-  padding:2px 0 2px 11px;
+.block li{
+  padding:3px 0 3px 12px;
   position:relative;
 }
-.spoke-card li::before{
+.block li::before{
   content:'';
   position:absolute;
   left:0;top:0.55em;
@@ -141,27 +86,8 @@ body{
   background:currentColor;
   opacity:0.4;
 }
-.spoke-card .note{font-size:0.68rem;color:var(--muted);margin-top:7px;line-height:1.45;}
-.spoke-card code{font-family:'DM Mono',monospace;font-size:0.68rem;background:rgba(0,0,0,0.05);padding:1px 4px;border-radius:3px;}
-
-/* Six spokes: clockwise from top matches notes tab order */
-.spokes .spoke:nth-child(1){--a:-90deg;}
-.spokes .spoke:nth-child(2){--a:-30deg;}
-.spokes .spoke:nth-child(3){--a:30deg;}
-.spokes .spoke:nth-child(4){--a:90deg;}
-.spokes .spoke:nth-child(5){--a:150deg;}
-.spokes .spoke:nth-child(6){--a:-150deg;}
-
-@media (max-width:720px){
-  .stage{max-width:none;aspect-ratio:auto;min-height:auto;padding-bottom:8px;}
-  .stage-svg{display:none;}
-  .hub{position:relative;left:auto;top:auto;transform:none;margin:0 auto 20px;}
-  .spokes{position:static;display:flex;flex-direction:column;gap:12px;pointer-events:auto;}
-  .spoke{
-    position:relative;left:auto;top:auto;width:100%;max-width:420px;margin:0 auto;
-    transform:none !important;
-  }
-}
+.block .note{font-size:0.8125rem;color:var(--muted);margin-top:8px;line-height:1.45;}
+.block code{font-family:'DM Mono',monospace;font-size:0.78rem;background:rgba(0,0,0,0.05);padding:1px 4px;border-radius:3px;}
 </style>
 </head>
 <body>
@@ -171,102 +97,67 @@ body{
     <p>Same outline as main notes · UML class &amp; sequence diagrams</p>
   </header>
 
-  <div class="stage" aria-label="Week 5 UML mind map">
-    <svg class="stage-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-      <path d="M50 50 L50 14" />
-      <path d="M50 50 L81.2 32" />
-      <path d="M50 50 L81.2 68" />
-      <path d="M50 50 L50 86" />
-      <path d="M50 50 L18.8 68" />
-      <path d="M50 50 L18.8 32" />
-    </svg>
+  <div class="block-list" aria-label="Week 5 UML topics">
+    <section class="block">
+      <div class="tag t1">① Relationship types</div>
+      <h2>How do classes connect?</h2>
+      <ul>
+        <li><strong>△ Generalization</strong> — is-a inheritance; abstract class → italic name</li>
+        <li><strong>— Association</strong> — the most general link</li>
+        <li><strong>◇ Aggregation</strong> — part–whole; part can exist alone</li>
+        <li><strong>◆ Composition</strong> — strong whole–part; lifetimes bound</li>
+      </ul>
+      <p class="note">Place the diamond on the <strong>whole</strong> side.</p>
+    </section>
 
-    <div class="hub">
-      <div class="hub-k">Week 5</div>
-      <div class="hub-t">UML<br>modeling</div>
-      <div class="hub-s">Class diagram · static structure<br>Sequence diagram · dynamic interaction</div>
-    </div>
+    <section class="block">
+      <div class="tag t2">② Multiplicity</div>
+      <h2>How to read numbers on a line?</h2>
+      <ul>
+        <li>Multiplicity sits on <strong>one end</strong> of the link and constrains objects at <strong>that</strong> end</li>
+        <li>Meaning of <code>0..1</code>, <code>1..*</code>, <code>0..*</code>, etc.</li>
+      </ul>
+      <p class="note">Quiz figures (Article–Author–Book, Publication): read each end <strong>separately</strong>.</p>
+    </section>
 
-    <div class="spokes">
-      <!-- ① Relationship types -->
-      <div class="spoke">
-        <div class="spoke-card">
-          <div class="tag t1">① Relationship types</div>
-          <h2>How do classes connect?</h2>
-          <ul>
-            <li><strong>△ Generalization</strong> — is-a inheritance; abstract class → italic name</li>
-            <li><strong>— Association</strong> — the most general link</li>
-            <li><strong>◇ Aggregation</strong> — part–whole; part can exist alone</li>
-            <li><strong>◆ Composition</strong> — strong whole–part; lifetimes bound</li>
-          </ul>
-          <p class="note">Place the diamond on the <strong>whole</strong> side.</p>
-        </div>
-      </div>
+    <section class="block">
+      <div class="tag t3">③ Class Diagram</div>
+      <h2>What belongs in static structure?</h2>
+      <ul>
+        <li>Tell <strong>Class / Attribute / Operation</strong> apart (nouns vs verbs)</li>
+        <li>Structure only—<strong>not</strong> algorithms, time, or interaction flow</li>
+      </ul>
+      <p class="note">Example: in a restaurant spec, <strong>Order</strong> is often an operation, not a class.</p>
+    </section>
 
-      <!-- ② Multiplicity -->
-      <div class="spoke">
-        <div class="spoke-card">
-          <div class="tag t2">② Multiplicity</div>
-          <h2>How to read numbers on a line?</h2>
-          <ul>
-            <li>Multiplicity sits on <strong>one end</strong> of the link and constrains objects at <strong>that</strong> end</li>
-            <li>Meaning of <code>0..1</code>, <code>1..*</code>, <code>0..*</code>, etc.</li>
-          </ul>
-          <p class="note">Quiz figures (Article–Author–Book, Publication): read each end <strong>separately</strong>.</p>
-        </div>
-      </div>
+    <section class="block">
+      <div class="tag t4">④ Sequence Diagram</div>
+      <h2>Interaction over time</h2>
+      <ul>
+        <li>Horizontal: objects and <strong>lifelines</strong>; vertical: <strong>Time</strong> ↓</li>
+        <li>Arrows: <strong>messages</strong></li>
+        <li>Order by <strong>triggering time</strong>, not importance or duration</li>
+      </ul>
+    </section>
 
-      <!-- ③ Class Diagram -->
-      <div class="spoke">
-        <div class="spoke-card">
-          <div class="tag t3">③ Class Diagram</div>
-          <h2>What belongs in static structure?</h2>
-          <ul>
-            <li>Tell <strong>Class / Attribute / Operation</strong> apart (nouns vs verbs)</li>
-            <li>Structure only—<strong>not</strong> algorithms, time, or interaction flow</li>
-          </ul>
-          <p class="note">Example: in a restaurant spec, <strong>Order</strong> is often an operation, not a class.</p>
-        </div>
-      </div>
+    <section class="block">
+      <div class="tag t5">⑤ OO modeling</div>
+      <h2>Map concepts to notation</h2>
+      <ul>
+        <li>Class, Object, Inheritance, Encapsulation, Association</li>
+        <li>Match terms to symbols in class and sequence diagrams</li>
+      </ul>
+    </section>
 
-      <!-- ④ Sequence Diagram -->
-      <div class="spoke">
-        <div class="spoke-card">
-          <div class="tag t4">④ Sequence Diagram</div>
-          <h2>Interaction over time</h2>
-          <ul>
-            <li>Horizontal: objects and <strong>lifelines</strong>; vertical: <strong>Time</strong> ↓</li>
-            <li>Arrows: <strong>messages</strong></li>
-            <li>Order by <strong>triggering time</strong>, not importance or duration</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ⑤ OO modeling -->
-      <div class="spoke">
-        <div class="spoke-card">
-          <div class="tag t5">⑤ OO modeling</div>
-          <h2>Map concepts to notation</h2>
-          <ul>
-            <li>Class, Object, Inheritance, Encapsulation, Association</li>
-            <li>Match terms to symbols in class and sequence diagrams</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- ⑥ Exam quick tips -->
-      <div class="spoke">
-        <div class="spoke-card">
-          <div class="tag t6">⑥ Exam quick tips</div>
-          <h2>Common mistakes</h2>
-          <ul>
-            <li>Part-whole → ◇ / ◆, not △</li>
-            <li>Queue backed by an array → <strong>Composition</strong></li>
-            <li>Class diagram = structure; sequence = behavior over time</li>
-          </ul>
-        </div>
-      </div>
-    </div>
+    <section class="block">
+      <div class="tag t6">⑥ Exam quick tips</div>
+      <h2>Common mistakes</h2>
+      <ul>
+        <li>Part-whole → ◇ / ◆, not △</li>
+        <li>Queue backed by an array → <strong>Composition</strong></li>
+        <li>Class diagram = structure; sequence = behavior over time</li>
+      </ul>
+    </section>
   </div>
 </div>
 </body>

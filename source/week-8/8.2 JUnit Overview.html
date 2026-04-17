@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8.2 JUnit: Overview – Study Notes + Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #ffffff;
+    color: #1a1a1a;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 48px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  header {
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 16px;
+    margin-bottom: 48px;
+  }
+  header .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  /* ── Section ── */
+  .section {
+    margin-bottom: 56px;
+    padding-top: 32px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 24px;
+  }
+
+  /* ── No quiz: same slide/transcript widths as .cols-with-quiz (third column stays empty) ── */
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── 3-col when quiz present ── */
+  .cols-with-quiz {
+    display: grid;
+    grid-template-columns: 1fr 1fr 300px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* ── Column label ── */
+  .col-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ebebeb;
+  }
+  .quiz-col .col-label {
+    color: #6b4fb8;
+    border-bottom-color: #c9b8f0;
+  }
+
+  /* ── Slide content ── */
+  .slide-content {
+    padding: 0;
+  }
+  .slide-content ul { list-style: none; padding: 0; }
+  .slide-content ul li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .slide-content ul li::before { content: "•"; position: absolute; left: 0; color: #888; }
+  .slide-content ul ul { margin-top: 4px; margin-left: 12px; }
+  .slide-content ul ul li::before { content: "·"; color: #aaa; }
+  .slide-content .intro { margin-bottom: 10px; font-size: 14px; }
+
+  .red { color: #c0392b; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+  .cite { font-size: 11px; color: #999; text-align: right; margin-top: 10px; font-style: italic; }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    color: #1a1a1a;
+  }
+  .code-block .kw { color: #c0392b; }
+  .code-block .st { color: #2980b9; }
+
+  /* ── Transcript ── */
+  .transcript p {
+    margin-bottom: 12px;
+    font-size: 14.5px;
+    color: #222;
+  }
+
+  /* ══════════════════════════════════════════
+     HIGHLIGHT STYLES — soft background only,
+     no borders, no outlines, no bold
+  ══════════════════════════════════════════ */
+  .hl-slide {
+    background: #fff3b0;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+  .hl-trans {
+    background: #b8e8ff;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* ══════════════════════════════════════════
+     QUIZ STYLES — minimal, no cards/boxes
+  ══════════════════════════════════════════ */
+  .quiz-item {
+    margin-bottom: 22px;
+  }
+  .quiz-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .quiz-num {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 4px;
+  }
+
+  .quiz-q {
+    font-size: 13px;
+    color: #1a1a1a;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+  .quiz-q code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: rgba(0,0,0,0.06);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  .quiz-options {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0 0;
+  }
+  .quiz-options li {
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 3px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #555;
+  }
+  .quiz-options li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #aaa;
+  }
+  .quiz-options li.correct {
+    color: #1a6b2e;
+  }
+  .quiz-options li.correct::before {
+    color: #1a6b2e;
+  }
+  .quiz-options li.correct::after {
+    content: " ✓";
+    color: #1a6b2e;
+  }
+
+  .quiz-answer {
+    font-size: 13px;
+    color: #1a1a1a;
+  }
+  .answer-true  { color: #1a6b2e; }
+  .answer-false { color: #8b1a1a; }
+
+  @media (max-width: 960px) {
+    .cols-with-quiz, .cols { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Study Notes · Software Testing</div>
+  <h1>JUnit Overview</h1>
+  <div style="margin-top:10px; font-size:13px; color:#666;">
+    <a href="index.html" style="color:#666; text-decoration:none;">Notebook Index</a>
+    &nbsp;·&nbsp;
+    <a href="7.5%20Black-Box%20Testing.html" style="color:#666; text-decoration:none;">Previous section</a>
+    &nbsp;·&nbsp;
+    <a href="8.3%20JUnit%3A%20Assertions.html" style="color:#666; text-decoration:none;">Next section</a>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1 – Learning Objectives  (no quiz)
+═══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Learning Objectives</div>
+  <div class="cols">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro">By the end of this video, you will be able to</p>
+        <ul>
+          <li>List main features of JUnit.</li>
+          <li>List basic annotations of a JUnit test case.</li>
+          <li>Explain the usage of BeforeEach and AfterEach.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>This is a lecture video on JUnit overview, being part of the lecture topic of software testing. By the end of this video, you will be able to list main features of JUnit, list basic annotations of a JUnit test case, and explain the usage of BeforeEach and AfterEach.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2 – JUnit Framework   Quiz: Q1, Q3
+═══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">JUnit Framework</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <ul>
+          <li>Open source Java unit testing framework (<span class="red">junit.org</span>) for writing and running repeatable <span class="red">automated tests</span></li>
+          <li>The latest version is JUnit 5, requiring Java 8 (or higher) at runtime
+            <ul>
+              <li>can still test code compiled with previous JDK versions</li>
+            </ul>
+          </li>
+          <li>Main JUnit features
+            <ul>
+              <li><span class="red hl-slide">Assertions</span> for checking expected results</li>
+              <li><span class="red hl-slide">Assumptions</span> for filtering out tests</li>
+              <li><span class="red hl-slide">Annotations</span> for configuring tests and extending the framework
+                <ul>
+                  <li><span class="hl-slide">disabling tests</span></li>
+                  <li>conditional test execution</li>
+                  <li>displaying names, tagging and filtering</li>
+                  <li>…</li>
+                </ul>
+              </li>
+              <li><span class="red">Test suites</span> for organizing and running tests</li>
+              <li><span class="red">Console launcher/test engines</span> for executing tests</li>
+            </ul>
+          </li>
+        </ul>
+        <p class="cite">(JUnit, 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>The JUnit framework is an open source Java unit testing framework for the work as write and run repeatable automated tests. Currently, the latest version of JUnit is JUnit 5, which requires Java 8 or higher at runtime. However, you can still use JUnit 5 to test the code under test compiled with previous JDK versions, not necessary Java 8 or higher.</p>
+        <p>There are a number of main features of JUnit. For example, you can write different kind of <span class="hl-trans">assertions for checking expected results</span>.</p>
+        <p>You can also write <span class="hl-trans">assumptions for filtering out certain tests</span> especially when the input values are being passed in to the tests such as a praumatize test which we will discuss in later lecture videos. There are also a number of other <span class="hl-trans">annotations for configuring tests</span> and expanding the framework. For example, you could use annotations to tentatively <span class="hl-trans">disable certain tests</span> and you can also configure certain conditional test execution. For example, you can configure certain unit tests to be executed when you are using a specific version of the operating system or using a specific version of the Java JDK version. You can use annotation to display names of the unit test when you are running these tests and reporting the failures or the passing status of these tests. You can also tag different unit tests and filter out the executions of certain unit tests viz a specific tag. You can group certain unit test cases into test suites so that you could run specific test suites.</p>
+        <p>In order to automatically execute certain unit tests, you can leverage console launcher or some tests engines being integrated into different kind of IDEs as a graphical user interface for running these unit tests.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 1</div>
+        <div class="quiz-q">Which of the following is a JUnit feature?</div>
+        <ul class="quiz-options">
+          <li>Assertion</li>
+          <li>Assumption</li>
+          <li>Annotation</li>
+          <li class="correct">All of the above</li>
+        </ul>
+      </div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 3</div>
+        <div class="quiz-q">True or False: A test method annotated with <code>@Ignore</code> will not be executed.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3 – Example JUnit Test Case   Quiz: Q4
+═══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Example JUnit Test Case</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <p class="intro"><strong>Class under test:</strong> java.util.Stack</p>
+        <p class="intro" style="margin-bottom:14px; font-size:13px; color:#555;">Test classes/methods don't need to be public.</p>
+        <div class="code-block"><span class="kw">import</span> java.util.Stack;
+<span class="kw">import</span> org.junit.jupiter.api.*;
+<span class="kw">import static</span> org.junit.jupiter.api.Assertions.*;
+
+class TestingAStackDemo
+{
+    <span class="kw">@Test</span>
+    <span class="kw hl-slide">@DisplayName(</span><span class="st hl-slide">"Push an element into empty stack"</span><span class="kw hl-slide">)</span>
+    void testPushOneElem()
+    {
+        String element1 = <span class="st">"element1"</span>;
+        <span class="kw">Stack&lt;Object&gt;</span> stack = new Stack&lt;&gt;();
+        stack.push(element1);
+        assertEquals(element1, stack.peek());
+        assertFalse(stack.isEmpty());
+    }
+}</div>
+        <p class="cite">(JUnit Example, 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>Now let's take a look at the example with JUnit test case. The class under test is the stack class from the Java util package. In order to test such stack class, we need to import such class so that our unit test can have access to this class. In addition, we also import these particular package from the JUnit framework. These particular package includes those typical annotations for unit tests such as @Test, @DisplayName. In addition, in order to allow us to write different kinds of assertions in our unit test, we also need to import this particular package including the definitions of different kinds of assertions.</p>
+        <p>Then we have the test class we named as TestingAStackDemo. Then within this test class, we can define different unit test cases as test methods. Here we shall only one example of the unit test as testPushOneElement. Note that the test method have void return type. In order to allow the JUnit testing framework to realize that a particular method is a unit test, we can add annotation @Test. <span class="hl-trans">We can also add specific string which can include space as a DisplayName when you are running the tests and getting the test reports.</span> Note that the name of the test method cannot allow you to include space but this plain name can have space there.</p>
+        <p>Then, the body of the unit test method includes a sequence of method calls along with the argument values for each method call and finally we also have assertions. Note that test classes or methods don't necessarily need to be public. We don't need to add the prefix public in front of the tests classes or methods. For this particular unit tests, basically the behavior is the following. We first create an empty stack and then we push element one as a string into the stack then we make sure top of the stack, which can be attained by invoking peek, to be the same as the element one. In addition, we also double-check that the stack is not empty. Basically, we invoke isEmpty method defined on stack and use assertion method as assertFalse.</p>
+        <p>Basically, we are asserting that the stack is empty return value is false.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 4</div>
+        <div class="quiz-q">True or False: We use <code>@DisplayName</code> to specify a custom name that is easy to read and provides information about the annotated test class or method.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 4 – BeforeEach and AfterEach   Quiz: Q2
+═══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">BeforeEach and AfterEach</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="code-block" style="font-size:11.5px;">class TestingAStackDemo
+{
+  <span class="kw">Stack&lt;Object&gt;</span> stack;
+  String element1 = <span class="st">"element1"</span>;
+  String element2 = <span class="st">"element2"</span>;
+  <span class="kw hl-slide">@BeforeEach</span>
+  <span class="hl-slide">void createNewStack() {</span>
+    stack = new Stack&lt;&gt;();
+  }
+
+  <span class="kw">@Test</span>
+  void testAddOneElem()
+  {
+    stack.push(element1);
+    assertEquals(element1,
+      stack.peek());
+  }</div>
+          <div class="code-block" style="font-size:11.5px;"><span class="kw">@Test</span>
+void testAddTwoElems()
+{
+  stack.push(element1);
+  stack.push(element2);
+  assertEquals(element2,
+    stack.peek());
+}
+
+<span class="kw">@AfterEach</span>
+void createNewStack() {
+  assertFalse(
+    stack.isEmpty());
+}
+}</div>
+        </div>
+        <p class="cite">(JUnit Example, 2018)</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>For a single class, or a single method from the class under test, we need to write multiple unit test cases instead of just a single unit test case. To allow us better manage multiple unit test cases for testing the same method or same class, we can structure our unit test to share certain objects being defined in our test class. For example, we can define instance object fields stack for our test class, and we can initialize two strings as the two elements that we would like to push into the stack for our later written unit test. <span class="hl-trans">We add a notation as at BeforeEach to indicate such methods to be executed before we execute each unit test in these test class.</span> Basically, BeforeEach method execution would allow us to initialize the stack with an empty stack. In this way, we don't have interference across different executions of the different unit test methods.</p>
+        <p>Then we have tool unit test methods for testing the push behavior. The first one is to add one element more precisely push one element into this empty stack and then we check the peek, basically, the top of the stack would be the same as the element1 that we just pushed. For the second test, we intend to test the behaviors of the stack after we push two elements. After that, we double-check the top of the stack as the return of the peek methods defined on stack to be the same as the element2, basically, the second element that we just pushed. In addiction, we can have additional annotations as AfterEach as the name indicates, we execute the methods being annotated as AfterEach. After the execution of each unit test method, in our example, we basically would like to double-check that the stack is not empty. For this particular test class, we have such behavior as that after we execute both has methods our stack is not empty.</p>
+        <p>But in general, we may not have such behaviors across all different test methods defined on the test class. So normally, we use such BeforeEach as more like initialization and use the methods mean annotated with AfterEach to carry out some clean up on operations after the testing is done.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 2</div>
+        <div class="quiz-q">True or False: Annotating a public void method with <code>@BeforeEach</code> causes that method to be run before each test method.</div>
+        <div class="quiz-answer"><span class="answer-true">✓ True</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SECTION 5 – Anti-Pattern: Tests Combined   Quiz: Q5
+═══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">Anti-Pattern: Tests Combined</div>
+  <div class="cols-with-quiz">
+
+    <div>
+      <div class="col-label">Slide content</div>
+      <div class="slide-content">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="code-block" style="font-size:11.5px;">class TestingAStackDemo
+{
+  <span class="kw">Stack&lt;Object&gt;</span> stack;
+  String element1 = <span class="st">"element1"</span>;
+  String element2 = <span class="st">"element2"</span>;
+  <span class="kw">@BeforeEach</span>
+  void createNewStack() {
+    stack = new Stack&lt;&gt;();
+  }
+
+  <span class="kw">@Test</span>
+  <span class="hl-slide">void testAddOneAndTwoElems()</span>
+  {
+    stack.push(element1);
+    assertEquals(element1,
+      stack.peek());
+    <span class="hl-slide">stack.push(element2);</span>
+    <span class="hl-slide">assertEquals(element2,</span>
+      <span class="hl-slide">stack.peek());</span>
+  }</div>
+          <div class="code-block" style="font-size:11.5px;"><span class="kw">@AfterEach</span>
+void createNewStack() {
+  assertFalse(
+    stack.isEmpty());
+}
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="col-label">Transcript</div>
+      <div class="transcript">
+        <p>When we are writing unit test, we need to watch out anti-pattern. <span class="hl-trans">Basically, we should avoid combining multiple unit tests into a single big unit test.</span> For the earlier tool unit test, some developers may combine them into a single unit tests. Basically, after we push one element, we check whether the top of the stack is the same as the element we just push. After that, we further push the second element and we further check whether now the top of the stack would be the same as the second element that we just pushed.</p>
+        <p>So, when we are not carrying out test automation, basically automatically running this unit test, then combining different unit tests together can allow you to reduce the efforts for re-running the prefix steps of certain other unit tests. However, when we use the automatic testing frameworks such as JUnit, we can break such big unit tests into smaller unit tests. <span class="hl-trans">The benefit is that we can have an easier time to debug the failures once the failures happens.</span> The second reason is that, if you write a big unit test like what we have put on the slide, <span class="hl-trans">then if the earlier assertion fails, then the whole test would then execute and therefore we don't get to observe whether the later assertions will fail or not, therefore limiting the information available to us for debugging the failure.</span> In summary, we need to avoid putting these kind of like a state modifying methods. Basically, the methods that can modify the state of the class under test in-between these assertions for checking the behaviors. We can break such a big unit test into multiple unit tests as we have written in earlier slides.</p>
+      </div>
+    </div>
+
+    <div class="quiz-col">
+      <div class="col-label">Quiz guidance</div>
+
+      <div class="quiz-item">
+        <div class="quiz-num">Question 5</div>
+        <div class="quiz-q">True or False: A big test is better than several small tests.</div>
+        <div class="quiz-answer"><span class="answer-false">✗ False</span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

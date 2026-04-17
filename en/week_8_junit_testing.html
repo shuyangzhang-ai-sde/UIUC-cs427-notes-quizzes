@@ -86,6 +86,11 @@ td:first-child{font-weight:600;color:var(--text);white-space:nowrap;}
 .blue-box .note-label{color:var(--blue);}
 .red-box .note-label{color:var(--red);}
 code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--tag-bg);padding:1px 6px;border-radius:3px;color:var(--text);}
+.pre-block{font-family:'Source Code Pro',monospace;font-size:0.78rem;line-height:1.65;background:var(--surface2);border:none;border-radius:var(--radius);padding:14px 16px;overflow-x:auto;margin-bottom:14px;white-space:pre;}
+.pre-block:last-child{margin-bottom:0;}
+.pre-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.pre-grid:last-child{margin-bottom:0;}
+@media (max-width:960px){.pre-grid{grid-template-columns:1fr;}}
 </style>
 <link href="../css/study-week-tabs.css" rel="stylesheet"/>
 <script src="../js/study-week-common.js"></script>
@@ -101,6 +106,7 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 </header>
 <nav class="tab-nav">
 <button class="tab-btn active" onclick="switchTab('basics',this)" type="button">Testing Basics</button>
+<button class="tab-btn" onclick="switchTab('8-2',this)" type="button">8.2 JUnit Overview</button>
 <button class="tab-btn" onclick="switchTab('junit',this)" type="button">JUnit framework</button>
 <button class="tab-btn" onclick="switchTab('annotations',this)" type="button">Annotations</button>
 <button class="tab-btn" onclick="switchTab('parameterized',this)" type="button">Parameterized tests</button>
@@ -132,6 +138,145 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 </div>
 <div class="note-box"><div class="note-label">Exam tip</div>Why “one big test is worse than several small tests”: <strong>when an assertion fails first, the following assertions may not execute at all.</strong></div>
 </div>
+</div>
+<div class="tab-panel" id="tab-8-2">
+
+<div class="card">
+<div class="card-title">JUnit Framework</div>
+<div class="keywords">
+<span class="kw green">JUnit 5</span><span class="kw green">Assertions</span><span class="kw green">Assumptions</span><span class="kw blue">Annotations</span><span class="kw">Test Suites</span><span class="kw">Automated Tests</span>
+</div>
+<ul class="blist">
+<li>Open source Java unit testing framework (<code>junit.org</code>) for writing and running repeatable <strong>automated tests</strong></li>
+<li>The latest version is JUnit 5, requiring Java 8 (or higher) at runtime; can still test code compiled with previous JDK versions</li>
+<li>Main JUnit features:
+<ul class="blist" style="margin-top:6px;margin-bottom:0;">
+<li><span class="hl-green">Assertions</span> for checking expected results</li>
+<li><span class="hl-amber">Assumptions</span> for filtering out tests</li>
+<li><span class="hl-blue">Annotations</span> for configuring tests and extending the framework — disabling tests, conditional test execution, displaying names, tagging and filtering</li>
+<li><span class="hl">Test suites</span> for organizing and running tests</li>
+<li><span class="hl">Console launcher / test engines</span> for executing tests</li>
+</ul>
+</li>
+</ul>
+<div class="green-box"><div class="note-label">Q1</div>Which of the following is a JUnit feature? → <strong>All of the above</strong> (Assertion, Assumption, Annotation are all JUnit features)</div>
+<div class="note-box"><div class="note-label">Q3</div>A test method annotated with <code>@Ignore</code> will not be executed. → <strong>True</strong></div>
+</div>
+
+<div class="card">
+<div class="card-title">Example JUnit Test Case</div>
+<div class="keywords">
+<span class="kw green">@Test</span><span class="kw blue">@DisplayName</span><span class="kw">assertEquals</span><span class="kw">assertFalse</span>
+</div>
+<div class="card-body"><span class="hl">Class under test:</span> <code>java.util.Stack</code> — Test classes/methods don't need to be public.</div>
+<pre class="pre-block">import java.util.Stack;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+class TestingAStackDemo
+{
+    @Test
+    @DisplayName("Push an element into empty stack")
+    void testPushOneElem()
+    {
+        String element1 = "element1";
+        Stack&lt;Object&gt; stack = new Stack&lt;&gt;();
+        stack.push(element1);
+        assertEquals(element1, stack.peek());
+        assertFalse(stack.isEmpty());
+    }
+}</pre>
+<div class="blue-box"><div class="note-label">Q4</div>We use <code>@DisplayName</code> to specify a custom name that is easy to read and provides information about the annotated test class or method. → <strong>True</strong></div>
+</div>
+
+<div class="card">
+<div class="card-title">@BeforeEach and @AfterEach</div>
+<div class="keywords">
+<span class="kw green">@BeforeEach</span><span class="kw green">@AfterEach</span><span class="kw">Initialization</span><span class="kw">Cleanup</span><span class="kw">Lifecycle</span>
+</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Annotation</th><th>When it runs</th><th>Typical use</th></tr></thead>
+<tbody>
+<tr><td><code>@BeforeEach</code></td><td>Before each <code>@Test</code></td><td>Initialize shared objects (e.g. create a fresh stack)</td></tr>
+<tr><td><code>@AfterEach</code></td><td>After each <code>@Test</code></td><td>Clean up state and resources</td></tr>
+</tbody>
+</table>
+</div>
+<div class="pre-grid">
+<pre class="pre-block">class TestingAStackDemo
+{
+  Stack&lt;Object&gt; stack;
+  String element1 = "element1";
+  String element2 = "element2";
+  @BeforeEach
+  void createNewStack() {
+    stack = new Stack&lt;&gt;();
+  }
+
+  @Test
+  void testAddOneElem()
+  {
+    stack.push(element1);
+    assertEquals(element1,
+      stack.peek());
+  }</pre>
+<pre class="pre-block">  @Test
+  void testAddTwoElems()
+  {
+    stack.push(element1);
+    stack.push(element2);
+    assertEquals(element2,
+      stack.peek());
+  }
+
+  @AfterEach
+  void createNewStack() {
+    assertFalse(
+      stack.isEmpty());
+  }
+}</pre>
+</div>
+<div class="note-box"><div class="note-label">Q2</div>Annotating a public void method with <code>@BeforeEach</code> causes that method to be run before each test method. → <strong>True</strong></div>
+</div>
+
+<div class="card">
+<div class="card-title">Anti-Pattern: Tests Combined</div>
+<div class="keywords">
+<span class="kw red">Anti-Pattern</span><span class="kw red">Fail Fast</span><span class="kw">State-modifying</span>
+</div>
+<div class="card-body">Avoid combining multiple unit tests into a single big test. If an earlier assertion fails, the whole test stops — later assertions never run, limiting debugging information.</div>
+<div class="pre-grid">
+<pre class="pre-block">class TestingAStackDemo
+{
+  Stack&lt;Object&gt; stack;
+  String element1 = "element1";
+  String element2 = "element2";
+  @BeforeEach
+  void createNewStack() {
+    stack = new Stack&lt;&gt;();
+  }
+
+  @Test
+  void testAddOneAndTwoElems()
+  {
+    stack.push(element1);
+    assertEquals(element1,
+      stack.peek());
+    stack.push(element2);
+    assertEquals(element2,
+      stack.peek());
+  }</pre>
+<pre class="pre-block">  @AfterEach
+  void createNewStack() {
+    assertFalse(
+      stack.isEmpty());
+  }
+}</pre>
+</div>
+<div class="red-box"><div class="note-label">Q5 — Exam tip</div>A big test is better than several small tests. → <strong>False</strong>. Avoid placing state-modifying calls between assertions; break combined tests into separate small tests.</div>
+</div>
+
 </div>
 <div class="tab-panel" id="tab-junit">
 <div class="card">

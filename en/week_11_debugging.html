@@ -120,111 +120,535 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 <h1>Chapter 11 — Debugging</h1>
 </header>
 <nav class="tab-nav">
-<button class="tab-btn active" onclick="switchTab('concepts',this)" type="button">Core concepts</button>
-<button class="tab-btn" onclick="switchTab('process',this)" type="button">Process &amp; reports</button>
-<button class="tab-btn" onclick="switchTab('tracking',this)" type="button">Tracking &amp; reproducing</button>
-<button class="tab-btn" onclick="switchTab('localize',this)" type="button">Simplification &amp; localization</button>
-<button class="tab-btn" onclick="switchTab('contract',this)" type="button">Assertions &amp; contracts</button>
+<button class="tab-btn" onclick="switchTab('11-1-overview',this)" type="button">11.1 Overview</button>
+<button class="tab-btn" onclick="switchTab('11-2-problem-tracker',this)" type="button">11.2 Problem Tracker</button>
+<button class="tab-btn" onclick="switchTab('11-3-tracking',this)" type="button">11.3 Tracking &amp; Reproducing</button>
+<button class="tab-btn" onclick="switchTab('11-4-simplification',this)" type="button">11.4 Failing-Input Simplification</button>
+<button class="tab-btn" onclick="switchTab('11-5-fault-localization',this)" type="button">11.5 Fault Localization</button>
+<button class="tab-btn" onclick="switchTab('11-6-assertions',this)" type="button">11.6 Assertions</button>
+<button class="tab-btn" onclick="switchTab('11-7-assertions-tool',this)" type="button">11.7 Assertions as a Tool</button>
+<button class="tab-btn" onclick="switchTab('11-8-design-by-contract',this)" type="button">11.8 Design by Contract</button>
+<button class="tab-btn active" onclick="switchTab('summary',this)" type="button">Summary</button>
 </nav>
-<div class="tab-panel active" id="tab-concepts">
+<div class="tab-panel" id="tab-11-1-overview">
 <div class="card">
-<div class="card-title">Failure, Fault and Debugging</div>
-<div class="keywords"><span class="kw green">Failure</span><span class="kw blue">Fault</span><span class="kw amber">Debugging</span></div>
-<div class="tbl-wrap">
-<table>
-<thead><tr><th>Term</th><th>Meaning</th></tr></thead>
-<tbody>
-<tr><td>Failure</td><td>Incorrect behavior or output <strong>observable at runtime</strong> — the <strong>symptoms</strong> of a problem.</td></tr>
-<tr><td>Fault</td><td>A <strong>defect</strong> in the code or design — the underlying <strong>root cause</strong> that can lead to failures.</td></tr>
-</tbody>
-</table>
-</div>
-<div class="card-body"><span class="hl">Debugging</span> aims to find and <strong>fix faults</strong>. <strong>Testing</strong> aims to <strong>discover failures</strong>. The two have different purposes.</div>
-<div class="green-box"><div class="note-label">Exam tip</div>On “purpose of debugging,” choose <strong>fix faults</strong> — not “fix failures” or “find faults.”</div>
-</div>
-</div>
-<div class="tab-panel" id="tab-process">
-<div class="card">
-<div class="card-title">Debugging Process</div>
-<div class="keywords"><span class="kw">Reproduce</span><span class="kw">Focus</span><span class="kw">Isolate</span></div>
-<div class="card-body">Typical steps include reproduce, focus, isolate, and more. If you see “Which is <strong>NOT</strong> part of the debugging process,” read every option carefully — for example, <strong>None of the above</strong> means every listed step actually belongs to debugging.</div>
+<div class="card-title">11.1 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Debugging</span><span class="kw blue">Testing</span><span class="kw amber">TRAFFIC</span></div>
 <ul class="blist">
-<li>Debugging and testing serve different purposes; they are not the same activity (a common <strong>False</strong> question).</li>
+<li>List the <strong>two major steps</strong> in debugging.</li>
+<li>Explain why a program should be <strong>re-tested</strong> after fixing a fault.</li>
+<li>Distinguish <strong>testing</strong> vs <strong>debugging</strong> in terms of failures and faults.</li>
+<li>Understand the seven steps in the <strong>TRAFFIC</strong> debugging process.</li>
 </ul>
 </div>
 <div class="card">
-<div class="card-title">Bug Report and Problem Tracker</div>
-<div class="keywords"><span class="kw blue">Bugzilla</span><span class="kw">Duplicate</span><span class="kw">History</span></div>
+<div class="card-title">From Testing to Debugging</div>
+<div class="keywords"><span class="kw">Mistake</span><span class="kw blue">Failure</span><span class="kw red">Fault</span></div>
 <div class="tbl-wrap">
 <table>
-<thead><tr><th>Topic</th><th>Description</th></tr></thead>
+<thead><tr><th>Topic</th><th>What to remember</th></tr></thead>
 <tbody>
-<tr><td>Bugzilla</td><td>A representative <strong>bug-tracking / issue-tracking</strong> system — not an IDE or a general-purpose debugger.</td></tr>
-<tr><td>Problem history</td><td>May include reproduction steps and other timeline details; a report can reference <strong>duplicate bug IDs</strong>.</td></tr>
+<tr><td>Testing</td><td>Main purpose is to <strong>find failures</strong> (symptoms: observed wrong behavior/results). Output often includes <strong>failing tests</strong>.</td></tr>
+<tr><td>Debugging</td><td>Given a failure, the purpose is to <strong>locate and fix the fault</strong> (root cause), then produce code changes that prevent future failures.</td></tr>
+<tr><td>Mistake → Fault → Failure</td><td>Developer mistakes can introduce a <strong>fault</strong> (defect/bug), which can later manifest as a <strong>failure</strong> during execution.</td></tr>
 </tbody>
 </table>
 </div>
+<div class="green-box"><div class="note-label">Program debugging</div>Two major steps are: <strong>(1) locate fault</strong> and <strong>(2) fix fault</strong>. The root cause may also involve configuration, data, or hardware context.</div>
 </div>
-</div>
-<div class="tab-panel" id="tab-tracking">
 <div class="card">
-<div class="card-title">Steps in Tracking / Reproducing</div>
-<div class="keywords"><span class="kw green">Neutralize</span><span class="kw green">Disambiguate</span><span class="kw">Generalize</span><span class="kw">Isolate</span></div>
-<div class="tbl-wrap">
-<table>
-<thead><tr><th>Step</th><th>Role (what to remember)</th></tr></thead>
-<tbody>
-<tr><td>Neutralize</td><td>Strip out <strong>negative, irrelevant, or emotional</strong> wording; keep the technical facts (“remove negative information”).</td></tr>
-<tr><td>Disambiguate</td><td>Remove ambiguity from the problem description.</td></tr>
-<tr><td>Generalize</td><td>Broaden conditions while the failure still reproduces (e.g. it still crashes with several different fonts).</td></tr>
-<tr><td>Isolate</td><td>Narrow the scope and pin down necessary conditions (e.g. “ONLY on Windows XP”).</td></tr>
-</tbody>
-</table>
-</div>
-<div class="note-box"><div class="note-label">Exam tip</div><strong>Isolate</strong> and <strong>generalization</strong> can be used together; they are not mutually exclusive (True/False items that claim they never appear together are often <strong>False</strong>).</div>
-</div>
-</div>
-<div class="tab-panel" id="tab-localize">
-<div class="card">
-<div class="card-title">Failing-Input Simplified: Binary Search &amp; Delta Debugging</div>
-<div class="keywords"><span class="kw blue">Binary Search</span><span class="kw amber">Delta Debugging</span></div>
+<div class="card-title">Why Re-test After a Fix</div>
+<div class="keywords"><span class="kw amber">Re-test</span><span class="kw green">Regression check</span></div>
 <ul class="blist">
-<li>To find the failing line in a large input, binary search needs about <strong>log₂(n)</strong> splits (<em>n</em> = number of lines).</li>
-<li>After binary search, you can still apply <strong>delta debugging</strong> to shrink the input further.</li>
-<li>Delta debugging: try a <strong>few large chunks</strong> of change first, then move toward <strong>more numerous, smaller</strong> changes.</li>
+<li>Confirm the original fault is <strong>fully fixed</strong>.</li>
+<li>Make sure the fix does <strong>not introduce new faults</strong>.</li>
 </ul>
 </div>
 <div class="card">
-<div class="card-title">Fault Localization Policy</div>
-<div class="keywords"><span class="kw green">Backtracking</span><span class="kw green">Tracing</span><span class="kw">Cause Elimination</span></div>
+<div class="card-title">Debugging Process — TRAFFIC</div>
+<div class="keywords"><span class="kw blue">Track</span><span class="kw blue">Reproduce</span><span class="kw blue">Automate</span><span class="kw blue">Find Origins</span><span class="kw blue">Focus</span><span class="kw blue">Isolate</span><span class="kw blue">Correct</span></div>
 <div class="tbl-wrap">
 <table>
-<thead><tr><th>Strategy</th><th>Typical use</th></tr></thead>
+<thead><tr><th>Step</th><th>Action</th></tr></thead>
 <tbody>
-<tr><td>Backtracking</td><td>Follow the <strong>error-propagation chain</strong> backward toward the fault. It usually does <strong>not</strong> mean “run instructions in reverse order.”</td></tr>
-<tr><td>Tracing</td><td>Use breakpoints, assertions, <code>print</code>, single-stepping, etc. to <strong>observe execution</strong>.</td></tr>
-<tr><td>Cause elimination</td><td>Systematically rule out candidate causes; requires program knowledge and <strong>experience</strong> with common mistakes.</td></tr>
+<tr><td>Track</td><td>Enter a problem (bug) report in a tracker (e.g., Bugzilla) with details for reproduction.</td></tr>
+<tr><td>Reproduce</td><td>Follow the report to reproduce the same failure reliably.</td></tr>
+<tr><td>Automate</td><td>Write system/unit tests so the failure can be reproduced automatically.</td></tr>
+<tr><td>Find Origins</td><td>Trace backward from a known infection/failure point along the infection chain.</td></tr>
+<tr><td>Focus</td><td>Inspect likely wrong locations (fault-prone history, explicit assertion violations).</td></tr>
+<tr><td>Isolate</td><td>Narrow down candidate causes using observation and experiments.</td></tr>
+<tr><td>Correct</td><td>Apply and validate the actual fix at the faulty location.</td></tr>
 </tbody>
 </table>
 </div>
-<div class="blue-box"><div class="note-label">Summary</div>Common tracing techniques include print debugging, breakpoints, assertions, and single-stepping. Exam questions may expect <strong>All of the above</strong>.</div>
 </div>
 </div>
-<div class="tab-panel" id="tab-contract">
+<div class="tab-panel" id="tab-11-2-problem-tracker">
 <div class="card">
-<div class="card-title">Assertions: Debug vs Test &amp; Production Code</div>
-<div class="keywords"><span class="kw">Debug</span><span class="kw">Test</span><span class="kw red">Production</span></div>
-<div class="card-body">Assertions in debugging vs. testing can differ in <strong>how and where</strong> you use them (many True/False questions say this is <strong>True</strong>).</div>
-<div class="red-box"><div class="note-label">Takeaway</div>Assertions generally <strong>should not</strong> be relied on as ordinary control-flow logic in production code (exams often expect <strong>No</strong>).</div>
+<div class="card-title">11.2 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Problem Report</span><span class="kw blue">Bugzilla</span><span class="kw amber">Bug Tracking</span></div>
+<ul class="blist">
+<li>List the <strong>seven types</strong> of relevant information in a problem report for reproducing a failure.</li>
+<li>List the <strong>main entries</strong> of a problem report in Bugzilla.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Problem Report — 7 Types of Information</div>
+<div class="keywords"><span class="kw">Environment</span><span class="kw blue">Problem History</span><span class="kw green">Expected vs Actual</span><span class="kw amber">Summary</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>#</th><th>Type</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Software version</td><td>Version(s) of the software product where the failure occurs.</td></tr>
+<tr><td>2</td><td>OS version</td><td>Version(s) of the operating system where the failure can happen.</td></tr>
+<tr><td>3</td><td>System resources</td><td>CPU usage, network bandwidth, storage allocation, etc.</td></tr>
+<tr><td>4</td><td>Problem history</td><td><strong>Steps to reproduce</strong> the failure (the most exam-tested field).</td></tr>
+<tr><td>5</td><td>Expected behavior</td><td>What the software <em>should</em> do per requirements.</td></tr>
+<tr><td>6</td><td>Experienced behavior</td><td>What <em>actually</em> happened — inconsistent with expected.</td></tr>
+<tr><td>7</td><td>One-line summary</td><td>Concise title capturing the essence of the failure.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam tip</div><strong>Problem history</strong> = steps to reproduce. Quiz Q1 asks exactly this — do not confuse with "system specifications" or "error output."</div>
+</div>
+<div class="card">
+<div class="card-title">Bugzilla / Problem Tracker Role</div>
+<div class="keywords"><span class="kw blue">Bugzilla</span><span class="kw">Duplicate ID</span><span class="kw red">Severity</span><span class="kw">Status</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Topic</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td>Bugzilla role</td><td><strong>Bug/issue tracking</strong> system — not an IDE and not a general-purpose debugger.</td></tr>
+<tr><td>Bug ID</td><td>Unique identifier assigned to each problem report.</td></tr>
+<tr><td>Duplicate status</td><td>A report marked <em>duplicate</em> references another bug ID that is already being handled or is verified fixed.</td></tr>
+<tr><td>Severity</td><td>Attribute indicating criticality (e.g. Normal → Critical); can be updated by a worker.</td></tr>
+<tr><td>Assignee</td><td>Person responsible for investigating; may be <strong>unassigned</strong> for duplicate reports.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam tip</div>Quiz always distinguishes Bugzilla from an IDE or debugging tool — answer is <strong>Bug Tracking tool</strong>.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-11-3-tracking">
+<div class="card">
+<div class="card-title">11.3 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Tracking</span><span class="kw blue">Reproducing</span><span class="kw amber">Problem Report</span></div>
+<ul class="blist">
+<li>List the <strong>seven key elements</strong> of tracking and reproducing a problem.</li>
+<li>Prepare a problem report for a given problem by following the seven key elements.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">7 Key Elements of Tracking &amp; Reproducing</div>
+<div class="keywords"><span class="kw">Describe</span><span class="kw blue">Isolate</span><span class="kw green">Generalize</span><span class="kw amber">Summarize</span><span class="kw">Condense</span><span class="kw blue">Disambiguate</span><span class="kw red">Neutralize</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>#</th><th>Element</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Describe</td><td>Provide <strong>specific steps</strong> for others to reproduce the problem.</td></tr>
+<tr><td>2</td><td>Isolate</td><td>Find the <strong>relevant parts</strong> of inputs/steps — narrow conditions until the problem disappears when you remove them.</td></tr>
+<tr><td>3</td><td>Generalize</td><td>Broaden to find <strong>other inputs/steps</strong> that also reproduce the same problem (e.g. also happens with Wingdings).</td></tr>
+<tr><td>4</td><td>Summarize</td><td>Compress all findings into <strong>one succinct sentence</strong> (e.g. "Arial, Wingdings, and Symbol fonts corrupt new files.").</td></tr>
+<tr><td>5</td><td>Condense</td><td>Shorten verbose sentences while preserving full meaning.</td></tr>
+<tr><td>6</td><td>Disambiguate</td><td><strong>Remove ambiguities</strong> — add clarifying phrases so the description is unambiguous.</td></tr>
+<tr><td>7</td><td>Neutralize</td><td>Remove <strong>negative/emotional language</strong>; replace with objective, factual descriptions.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam tip</div><strong>Isolate</strong> and <strong>Generalize</strong> can be used together — they are not mutually exclusive. Quiz Q3 "do not happen together" → <strong>False</strong>.</div>
+</div>
+<div class="card">
+<div class="card-title">SpeedyWriter Example — Key Takeaways</div>
+<div class="keywords"><span class="kw blue">Isolate</span><span class="kw green">Generalize</span><span class="kw amber">Neutralize</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Element</th><th>Example from SpeedyWriter report</th></tr></thead>
+<tbody>
+<tr><td>Isolate</td><td>Bug only occurs on <strong>new files</strong>, only on <strong>Windows 98</strong>, only with builds 1.1.007–1.1.017 — each removed condition made the bug disappear.</td></tr>
+<tr><td>Generalize</td><td>Problem also reproduces with <strong>Wingdings</strong> and <strong>Symbol</strong> fonts, and with bold/italic/strikethrough/underline effects.</td></tr>
+<tr><td>Summarize</td><td><em>"Arial, Wingdings, and Symbol fonts corrupt new files."</em></td></tr>
+<tr><td>Neutralize</td><td>"Nasty bug trashed… meaningless garbage" → <em>"All texts converted to control characters, numbers, and other apparently random binary data."</em></td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam tip</div><strong>Neutralize</strong> = remove <em>negative information</em> (emotional/offensive wording). Quiz Q1 answer: <strong>Remove negative information</strong> — not "remove system info" or "add details."</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-11-4-simplification">
+<div class="card">
+<div class="card-title">11.4 Learning Objectives</div>
+<div class="keywords"><span class="kw blue">Binary Search</span><span class="kw amber">Delta Debugging</span><span class="kw green">Failing Input</span></div>
+<ul class="blist">
+<li>Explain the key idea of <strong>binary search</strong> to simplify a failing input.</li>
+<li>Explain the key idea of <strong>delta debugging</strong> to simplify a failing input.</li>
+<li>Conduct binary search / delta debugging to simplify a given failing input.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Binary Search to Simplify Failing Input</div>
+<div class="keywords"><span class="kw blue">Split</span><span class="kw">Discard Half</span><span class="kw green">log₂(n)</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Step</th><th>What happens</th></tr></thead>
+<tbody>
+<tr><td>Split</td><td>Divide the current failing input into <strong>two halves</strong>.</td></tr>
+<tr><td>Try first half</td><td>If still <strong>failing</strong> → keep it, repeat. If <strong>passing</strong> → discard it, try the other half.</td></tr>
+<tr><td>Repeat</td><td>Keep halving until you cannot reduce further.</td></tr>
+<tr><td>Cost</td><td>Needs about <strong>log₂(n)</strong> tries for an input with <em>n</em> lines.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam tip</div>Q1: failing input with 1000 lines → <strong>log₂(1000)</strong> tries. The other options (logₑ, 2^1000, e^1000) are all wrong.</div>
+</div>
+<div class="card">
+<div class="card-title">Delta Debugging — When Binary Search Gets Stuck</div>
+<div class="keywords"><span class="kw amber">Few Large → More Small</span><span class="kw blue">Granularity</span><span class="kw">Alternatives</span></div>
+<div class="card-body">Binary search gets stuck when <strong>both halves pass</strong> independently. Delta debugging handles this by refining the granularity of changes.</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Phase</th><th>What to do</th></tr></thead>
+<tbody>
+<tr><td>Start</td><td>Try <strong>few, large changes</strong> (e.g. remove halves) to produce alternative smaller inputs.</td></tr>
+<tr><td>Both pass?</td><td>Increase granularity: split into <strong>more, smaller changes</strong> (quarters, eighths, …).</td></tr>
+<tr><td>Found failing?</td><td>Adopt the new smaller failing input and restart with it.</td></tr>
+<tr><td>Stop</td><td>When no smaller alternative produces a failing input — that is the <strong>minimum failing input</strong>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam tip</div>Q3: delta debugging starts with <strong>few, large changes → more, small changes</strong>. The other orders are all wrong.</div>
+<div class="blue-box"><div class="note-label">Relationship</div>Q2: delta debugging is used to <strong>further simplify</strong> after binary search can no longer make progress → <strong>True</strong>.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-11-5-fault-localization">
+<div class="card">
+<div class="card-title">11.5 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Tracing</span><span class="kw blue">Backtracking</span><span class="kw amber">Cause Elimination</span></div>
+<ul class="blist">
+<li>List the <strong>main activities</strong> during fault localization.</li>
+<li>List the <strong>expertise</strong> needed to conduct cause elimination.</li>
+<li>Conduct tracing, backtracking, and cause elimination given a failing input.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Three Main Activities in Fault Localization</div>
+<div class="keywords"><span class="kw green">Tracing</span><span class="kw blue">Backtracking</span><span class="kw amber">Cause Elimination</span><span class="kw">Coverage-based</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Activity</th><th>What it means</th><th>Techniques</th></tr></thead>
+<tbody>
+<tr><td>Tracing</td><td><strong>Watch execution</strong> to collect runtime info (variable values, branch taken) and determine when it goes wrong.</td><td>Print statements, single-stepping, logging (log4j), breakpoints, assertions/watchpoints.</td></tr>
+<tr><td>Backtracking</td><td>Start from the observed failure and <strong>follow the error propagation chain backward</strong> to find the first error / fault location.</td><td>Add print statements at hypothesized earlier points; repeatedly re-run and trace back further.</td></tr>
+<tr><td>Cause elimination</td><td>List <strong>all possible causes</strong> of the failure and check each one by examining the program and running experiments.</td><td>Use a debugger to force values at runtime; formulate hypotheses and test them.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam tip</div>Q1 "following error propagation chain" → <strong>Backtracking</strong>. Q2 "breakpoints / assertions / print statements" → <strong>Tracing</strong>. Q3 "check every possible cause" → <strong>Cause elimination</strong>.</div>
+</div>
+<div class="card">
+<div class="card-title">Expertise Needed for Cause Elimination</div>
+<div class="keywords"><span class="kw amber">Program Knowledge</span><span class="kw red">Common Faults</span><span class="kw">Mental Execution</span></div>
+<ul class="blist">
+<li>Must understand the <strong>model / expected behavior</strong> of the program — can mentally simulate execution without running it.</li>
+<li>Must know <strong>common developer faults</strong> for the language/platform, e.g.:
+  <ul style="margin-top:4px;padding-left:16px;list-style:disc;">
+    <li>C/C++: null pointer dereference, pointer errors, memory leaks.</li>
+    <li>File I/O: not closing a file after opening and reading.</li>
+    <li>OOP: not initializing objects correctly; invoking a method on the wrong object.</li>
+  </ul>
+</li>
+</ul>
+<div class="note-box"><div class="note-label">Exam tip</div>Q4 "cause elimination requires expertise about the program and common developer faults" → <strong>True</strong>.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-11-6-assertions">
+<div class="card">
+<div class="card-title">11.6 Learning Objectives</div>
+<div class="keywords"><span class="kw green">assert exp1 : exp2</span><span class="kw blue">Java Assertions</span><span class="kw amber">JUnit Assertions</span></div>
+<ul class="blist">
+<li>Explain what <strong>exp2</strong> is for in <code>assert exp1 : exp2</code>.</li>
+<li>Explain the <strong>differences</strong> between assertions in Java programs and assertions in JUnit.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Assertions in Debugging vs JUnit</div>
+<div class="keywords"><span class="kw green">Program Assertion</span><span class="kw blue">JUnit Assertion</span><span class="kw red">Different</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Type</th><th>Where</th><th>Purpose</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td>Program assertion</td><td>Inside production / debug code</td><td>Detect errors <strong>close to where they occur</strong> — easier to trace back to the fault.</td><td><code>assert !isEmpty() : "Stack is empty"</code></td></tr>
+<tr><td>JUnit assertion</td><td>Inside test code</td><td>Check observable behavior from <strong>outside</strong> the program (black-box style).</td><td><code>assertEquals</code>, <code>assertTrue</code></td></tr>
+</tbody>
+</table>
+</div>
+<div class="card-body">Program assertions detect errors <strong>closer to the fault</strong> location; JUnit assertions detect propagated errors at the <strong>failure</strong> location — so the two serve different roles.</div>
+</div>
+<div class="card">
+<div class="card-title">Java <code>assert</code> Syntax &amp; Enable / Disable</div>
+<div class="keywords"><span class="kw">assert exp1</span><span class="kw amber">: exp2</span><span class="kw green">-ea</span><span class="kw red">Production</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Syntax</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>assert exp1;</code></td><td>If <em>exp1</em> is false at this point, throw <code>AssertionError</code>.</td></tr>
+<tr><td><code>assert exp1 : exp2;</code></td><td><em>exp2</em> is the <strong>argument (message) of the exception</strong> thrown when <em>exp1</em> fails — used for diagnosis.</td></tr>
+</tbody>
+</table>
+</div>
+<ul class="blist">
+<li><strong>Enable</strong> assertions in JVM: <code>-ea[:package|:ClassName]</code></li>
+<li><strong>Disable</strong> assertions in JVM: <code>-da[:package|:ClassName]</code></li>
+<li>Assertions are typically <strong>disabled in production</strong> to avoid performance overhead — especially for high-performance systems.</li>
+</ul>
+<div class="note-box"><div class="note-label">Key distinction</div><em>exp2</em> is NOT a second condition — it is the <strong>exception message/argument</strong> shown when the assertion fails.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-11-7-assertions-tool">
+<div class="card">
+<div class="card-title">11.7 Learning Objectives</div>
+<div class="keywords"><span class="kw green">assert exp1 : exp2</span><span class="kw blue">Java vs JUnit</span><span class="kw red">Production</span></div>
+<ul class="blist">
+<li>Explain what <strong>exp2</strong> is for in <code>assert exp1 : exp2</code>.</li>
+<li>Explain the <strong>differences</strong> between assertions in Java (debugging) and assertions in JUnit (testing).</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Assertions in Debugging vs Testing — Key Differences</div>
+<div class="keywords"><span class="kw green">Debugging Assertion</span><span class="kw blue">Testing Assertion</span><span class="kw red">Different</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Dimension</th><th>Debugging (Java <code>assert</code>)</th><th>Testing (JUnit)</th></tr></thead>
+<tbody>
+<tr><td>Location</td><td><strong>Inside</strong> the program code</td><td>Inside test code (outside the program)</td></tr>
+<tr><td>Goal</td><td>Catch errors <strong>close to the fault</strong> — faster diagnosis</td><td>Detect failures as <strong>observable behavior</strong></td></tr>
+<tr><td>Examples</td><td><code>assert !isEmpty() : "Stack is empty"</code></td><td><code>assertEquals</code>, <code>assertTrue</code></td></tr>
+<tr><td>Overhead</td><td>Can be disabled with <code>-da</code></td><td>Always active during test runs</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam tip — Q1</div>"Assertions in debugging are different from those in testing" → <strong>True</strong>. They differ in location, purpose, and syntax.</div>
+</div>
+<div class="card">
+<div class="card-title">Should Assertions Be in Production Code?</div>
+<div class="keywords"><span class="kw red">No</span><span class="kw">Performance Overhead</span><span class="kw amber">-ea / -da</span></div>
+<ul class="blist">
+<li>Assertions add <strong>runtime overhead</strong> — each check costs execution time.</li>
+<li>High-performance production systems typically <strong>disable assertions</strong> (<code>-da</code>) to avoid this cost.</li>
+<li>Assertions in production code should <strong>not</strong> be relied upon as normal control-flow logic.</li>
+</ul>
+<div class="red-box"><div class="note-label">Exam tip — Q2</div>"Should assertions be part of production code?" → <strong>No</strong>.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-11-8-design-by-contract">
+<div class="card">
+<div class="card-title">11.8 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Precondition</span><span class="kw blue">Postcondition</span><span class="kw amber">Class Invariant</span><span class="kw">Loop Invariant</span></div>
+<ul class="blist">
+<li>Explain the differences among <strong>preconditions, postconditions, class invariants, and loop invariants</strong>.</li>
+<li>Write preconditions, postconditions, and class invariants given a class and its requirements.</li>
+<li>Determine whether a given assertion is a <strong>loop invariant</strong> for a program with a loop.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Types of Assertions — Design by Contract</div>
+<div class="keywords"><span class="kw green">Precondition</span><span class="kw blue">Postcondition</span><span class="kw amber">Class Invariant</span><span class="kw">Loop Invariant</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Type</th><th>When true</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td>Precondition</td><td><strong>Before</strong> a method executes</td><td>Conditions the method requires to work correctly; guards against illegal inputs.</td></tr>
+<tr><td>Postcondition</td><td><strong>After</strong> a method executes (given precondition held)</td><td>Describes what the method guarantees on exit. Often hard to specify in practice.</td></tr>
+<tr><td>Class invariant</td><td>Before <strong>and</strong> after every public method body</td><td>Acts as both precondition and postcondition for every public method in the class.</td></tr>
+<tr><td>Loop invariant</td><td><strong>Before loop, after loop, every iteration</strong></td><td>A property that holds at all three points throughout the loop's lifecycle.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam tip — Q1</div>"Assertion that must be True <em>after</em> a method execution" 
+<br>→ <strong>Postcondition</strong> (Precondition = before; Checkpoint = inside program).</div>
+</div>
+<div class="card">
+<div class="card-title">Invariants — Always True</div>
+<div class="keywords"><span class="kw amber">Always True</span><span class="kw green">Class Invariant</span><span class="kw blue">Loop Invariant</span></div>
+<div class="card-body"><strong>An <span class="hl">invariant</span> is an assertion that should be always true</strong> at the location where it is specified — both types hold across all relevant execution points.</div>
+<ul class="blist">
+<li><strong>Class invariant</strong> 
+  <br>example: <code>Math.MIN_INT ≤ lower &lt; upper ≤ Math.MAX_INT</code> 
+  <br>— must hold at the start and end of every public method (<code>setLower</code>, <code>setUpper</code>).
+</li>
+<li><strong>Loop invariant</strong> 
+  <br>example for summing 1…n: <code>s == sumFrom(i+1, n)</code> 
+  <br>— <strong>holds before the loop, before each iteration, and after the loop exits.</strong>
+</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Practical Usage of Contract Assertions</div>
+<div class="keywords"><span class="kw green">Write Preconditions</span><span class="kw amber">Postconditions Hard</span><span class="kw blue">Unit Tests Instead</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Type</th><th>Practice</th></tr></thead>
+<tbody>
+<tr><td>Preconditions</td><td><strong>Encouraged</strong> — relatively easy to write; improves robustness against illegal inputs.</td></tr>
+<tr><td>Class invariants</td><td>Encouraged when not too complicated to specify.</td></tr>
+<tr><td>Postconditions</td><td>Often <strong>skipped</strong> — too complex; developers write unit tests (parameterized tests) instead to cover specific scenarios.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="tab-panel active" id="tab-summary">
+<div class="card">
+<div class="card-title">Failure, Fault &amp; the Debugging Chain</div>
+<div class="keywords"><span class="kw red">Mistake</span><span class="kw blue">Fault</span><span class="kw green">Failure</span><span class="kw amber">Debugging</span><span class="kw">Testing</span></div>
+<div class="tbl-wrap">
+
+<table>
+<thead><tr><th>Term</th><th>Definition &amp; exam angle</th></tr></thead>
+<tbody>
+<tr><td>Mistake</td><td>Human error made by the developer — introduces a <strong>fault</strong>.</td></tr>
+<tr><td>Fault</td><td>A <strong>defect / bug</strong> in the code — the root cause. “Cause of bugs” = Fault.</td></tr>
+<tr><td>Failure</td><td>Incorrect behavior <strong>observable at runtime</strong> — the symptom. “Symptoms of bugs” = Failure.</td></tr>
+<tr><td>Testing</td><td>Aims to <strong>find failures</strong>. Testing ≠ Debugging (common <strong>False</strong> Q).</td></tr>
+<tr><td>Debugging</td><td>Given a failure, aims to <strong>locate and fix the fault</strong>. Purpose = <strong>fix faults</strong>, not “fix failures.”</td></tr>
+</tbody>
+</table>
+</div>
+<div class="card-body">Two major steps of debugging: <strong>(1) locate the fault</strong>, <strong>(2) fix the fault</strong>. After fixing, always <strong>re-test</strong>: confirm the fix works and check no new faults were introduced.</div>
+<div class="green-box"><div class="note-label">Exam tip</div>Debugging can <strong>introduce new bugs</strong> (regression) → True. If a bug cannot be reproduced it does <strong>not</strong> mean it no longer exists → False.</div>
+</div>
+<div class="card">
+<div class="card-title">Debugging Process — TRAFFIC</div>
+<div class="keywords"><span class="kw blue">Track</span><span class="kw blue">Reproduce</span><span class="kw blue">Automate</span><span class="kw blue">Find Origins</span><span class="kw blue">Focus</span><span class="kw blue">Isolate</span><span class="kw blue">Correct</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Step</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>Track</td><td>Enter a <strong>problem report</strong> in a tracker (e.g. Bugzilla) with details for reproduction.</td></tr>
+<tr><td>Reproduce</td><td>Follow the report to <strong>reproduce the failure reliably</strong> (aim for 3/3 tries).</td></tr>
+<tr><td>Automate</td><td>Write system/unit tests so the failure can be reproduced <strong>automatically</strong>.</td></tr>
+<tr><td>Find Origins</td><td>Trace <strong>backward</strong> from the known failure along the infection chain.</td></tr>
+<tr><td>Focus</td><td>Inspect <strong>likely-wrong locations</strong> (fault-prone history, assertion violations).</td></tr>
+<tr><td>Isolate</td><td>Narrow down candidate causes via observation and experiments.</td></tr>
+<tr><td>Correct</td><td><strong>Apply and validate</strong> the fix at the faulty location.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam tip</div>”Ignore the bug if it is minor” is <strong>NOT</strong> a step. “None of the above” when all listed options are valid TRAFFIC steps → choose <strong>None of the above</strong>.</div>
+</div>
+<div class="card">
+<div class="card-title">Problem Report — 7 Types of Information</div>
+<div class="keywords"><span class="kw">Environment</span><span class="kw blue">Problem History</span><span class="kw green">Expected vs Actual</span><span class="kw amber">One-line Summary</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>#</th><th>Type</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Software version</td><td>Version(s) of the software where the failure occurs.</td></tr>
+<tr><td>2</td><td>OS version</td><td>Version(s) of the operating system.</td></tr>
+<tr><td>3</td><td>System resources</td><td>CPU usage, network bandwidth, storage allocation, etc.</td></tr>
+<tr><td>4</td><td>Problem history</td><td><strong>Steps to reproduce</strong> the failure — most exam-tested field.</td></tr>
+<tr><td>5</td><td>Expected behavior</td><td>What the software <em>should</em> do per requirements.</td></tr>
+<tr><td>6</td><td>Experienced behavior</td><td>What <em>actually</em> happened — inconsistent with expected.</td></tr>
+<tr><td>7</td><td>One-line summary</td><td>Concise title capturing the essence of the failure.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam tip</div><strong>Problem history</strong> = steps to reproduce — not “system specs” or “error output.” Bug report <strong>includes duplicate bug IDs</strong> → True.</div>
+</div>
+<div class="card">
+<div class="card-title">Bugzilla / Problem Tracker</div>
+<div class="keywords"><span class="kw blue">Bugzilla</span><span class="kw">Duplicate ID</span><span class="kw red">Severity</span><span class="kw">Assignee</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Field / concept</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td>Role</td><td><strong>Bug/issue tracking</strong> system — <em>not</em> an IDE, <em>not</em> a debugger.</td></tr>
+<tr><td>Duplicate status</td><td>References another bug ID already handled or verified-fixed.</td></tr>
+<tr><td>Severity</td><td>Criticality attribute (e.g. Normal → Critical); updated by a worker.</td></tr>
+<tr><td>Assignee</td><td>May be <strong>unassigned</strong> for duplicate reports.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam tip</div>Bugzilla = <strong>Bug Tracking tool</strong>, not IDE or debugging tool. “Support contact info” is <strong>NOT</strong> a required field in a bug report.</div>
+</div>
+<div class="card">
+<div class="card-title">Tracking &amp; Reproducing — 7 Key Elements</div>
+<div class="keywords"><span class="kw">Describe</span><span class="kw blue">Isolate</span><span class="kw green">Generalize</span><span class="kw amber">Summarize</span><span class="kw">Condense</span><span class="kw blue">Disambiguate</span><span class="kw red">Neutralize</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Element</th><th>What to do</th><th>SpeedyWriter example</th></tr></thead>
+<tbody>
+<tr><td>Describe</td><td>Specific steps for others to reproduce.</td><td>List steps 1-5 with exact actions in the editor.</td></tr>
+<tr><td>Isolate</td><td>Narrow conditions — remove parts until the bug disappears.</td><td>Only new files; only Windows 98; only builds 1.1.007-1.1.017.</td></tr>
+<tr><td>Generalize</td><td>Broaden — find other inputs/steps that also trigger the bug.</td><td>Also happens with Wingdings, Symbol fonts, bold/italic/underline.</td></tr>
+<tr><td>Summarize</td><td>Compress findings into <strong>one succinct sentence</strong>.</td><td><em>”Arial, Wingdings, and Symbol fonts corrupt new files.”</em></td></tr>
+<tr><td>Condense</td><td>Shorten verbose sentences, preserving meaning.</td><td>”Saving file before changing font prevents bug.”</td></tr>
+<tr><td>Disambiguate</td><td>Remove ambiguities; add clarifying phrases.</td><td>”highlighted the text” → “highlighted all four lines of the text.”</td></tr>
+<tr><td>Neutralize</td><td>Remove <strong>negative/emotional language</strong>; keep factual.</td><td>”nasty bug trashed… meaningless garbage” → “texts converted to control characters and binary data.”</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam tips</div>Neutralize = <strong>remove negative information</strong> (not “remove system info”). Disambiguate removes ambiguities → <strong>True</strong>. Isolate and Generalize <strong>can</strong> happen together → “never together” = <strong>False</strong>.</div>
+</div>
+<div class="card">
+<div class="card-title">Failing-Input Simplification — Binary Search &amp; Delta Debugging</div>
+<div class="keywords"><span class="kw blue">Binary Search</span><span class="kw green">log₂(n)</span><span class="kw amber">Delta Debugging</span><span class="kw">Few Large → More Small</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Technique</th><th>How it works</th><th>Key fact</th></tr></thead>
+<tbody>
+<tr><td>Binary search</td><td>Split failing input in half; keep the half that still fails; repeat.</td><td>~<strong>log₂(n)</strong> tries for n-line input. (1000 lines → log₂(1000) tries)</td></tr>
+<tr><td>Delta debugging</td><td>When both halves pass, refine granularity: try removing quarters, eighths, … until a smaller failing input is found.</td><td>Starts with <strong>few, large changes</strong> → progresses to <strong>more, small changes</strong>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="blue-box"><div class="note-label">Relationship</div>Delta debugging is used to <strong>further simplify</strong> after binary search gets stuck (both halves pass) → <strong>True</strong>. Goal of both: produce the <strong>minimum failing input</strong> to aid fault localization.</div>
+</div>
+<div class="card">
+<div class="card-title">Fault Localization — Tracing, Backtracking, Cause Elimination</div>
+<div class="keywords"><span class="kw green">Tracing</span><span class="kw blue">Backtracking</span><span class="kw amber">Cause Elimination</span><span class="kw">Coverage-based</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Activity</th><th>Core idea</th><th>Techniques / requires</th></tr></thead>
+<tbody>
+<tr><td>Tracing</td><td><strong>Watch execution</strong> — collect variable values, branches taken; determine when it goes wrong.</td><td>Print statements, single-stepping, logging (log4j), breakpoints, assertions/watchpoints. Exam: <strong>All of the above.</strong></td></tr>
+<tr><td>Backtracking</td><td>Start from failure; <strong>follow error-propagation chain backward</strong> to find the first error/fault location.</td><td>Add print statements at hypothesized earlier points; re-run repeatedly. Does <strong>NOT</strong> mean reversing instruction order.</td></tr>
+<tr><td>Cause elimination</td><td>List <strong>all possible causes</strong>; check each by examining code and running experiments.</td><td>Requires <strong>program knowledge</strong> + knowledge of <strong>common developer faults</strong> (null pointers, missing file close, wrong object, etc.).</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam tips</div>”Follow error propagation chain” → <strong>Backtracking</strong>. “Breakpoints / assertions / print statements” → <strong>Tracing</strong>. “Check every possible cause” → <strong>Cause elimination</strong>. Cause elimination requires expertise → <strong>True</strong>. To pause execution → <strong>set a breakpoint</strong>.</div>
+</div>
+<div class="card">
+<div class="card-title">Assertions — Debugging vs Testing &amp; Production</div>
+<div class="keywords"><span class="kw green">assert exp1 : exp2</span><span class="kw blue">Java vs JUnit</span><span class="kw red">No in Production</span><span class="kw amber">-ea / -da</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Dimension</th><th>Debugging (Java <code>assert</code>)</th><th>Testing (JUnit)</th></tr></thead>
+<tbody>
+<tr><td>Location</td><td><strong>Inside</strong> program / debug code</td><td>Inside test code (outside program)</td></tr>
+<tr><td>Goal</td><td>Catch errors <strong>close to the fault</strong></td><td>Detect <strong>failures</strong> as observable behavior</td></tr>
+<tr><td>Syntax</td><td><code>assert exp1 : exp2</code> — exp2 is the <strong>exception message</strong></td><td><code>assertEquals</code>, <code>assertTrue</code>, …</td></tr>
+<tr><td>Overhead</td><td>Disable with <code>-da</code>; enable with <code>-ea</code></td><td>Always active during test runs</td></tr>
+</tbody>
+</table>
+</div>
+<div class="red-box"><div class="note-label">Exam tips</div>Assertions in debugging differ from those in testing → <strong>True</strong>. Should assertions be in production code? → <strong>No</strong>.</div>
 </div>
 <div class="card">
 <div class="card-title">Design by Contract</div>
-<div class="keywords"><span class="kw green">Precondition</span><span class="kw green">Postcondition</span><span class="kw">Invariant</span></div>
-<ul class="blist">
-<li><strong>Postcondition</strong>: an assertion that should hold <strong>after</strong> the method finishes.</li>
-<li><strong>Invariant</strong>: in this course, often tested as “always true” over the relevant scope (many T/F answers are <strong>True</strong>).</li>
-<li><strong>Loop invariant</strong>: must hold <strong>before the loop, before each iteration, and when the loop exits</strong> (match the wording to the quiz options).</li>
-</ul>
+<div class="keywords"><span class="kw green">Precondition</span><span class="kw blue">Postcondition</span><span class="kw amber">Class Invariant</span><span class="kw">Loop Invariant</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Type</th><th>When it holds</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td>Precondition</td><td><strong>Before</strong> method executes</td><td>Required conditions; guards against illegal inputs. <em>Encouraged</em> to write.</td></tr>
+<tr><td>Postcondition</td><td><strong>After</strong> method executes</td><td>Guarantees on exit. Often <em>skipped</em> — too complex; unit tests used instead.</td></tr>
+<tr><td>Class invariant</td><td>Before <strong>and</strong> after every public method</td><td>Acts as both precondition and postcondition for all public methods.</td></tr>
+<tr><td>Loop invariant</td><td><strong>Before loop + every iteration + after loop</strong></td><td>Holds at all three points. e.g. <code>s == sumFrom(i+1, n)</code>.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam tips</div>”True after a method execution” → <strong>Postcondition</strong>. “Invariants are always True” → <strong>True</strong>. Loop invariant must hold: <strong>before, during, and after</strong> the loop — all three.</div>
 </div>
 </div>
 </div>
@@ -240,6 +664,7 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 <button class="qz-tab-btn" onclick="switchQuizTab('11-3',this)" type="button">11.3</button>
 <button class="qz-tab-btn" onclick="switchQuizTab('11-4',this)" type="button">11.4</button>
 <button class="qz-tab-btn" onclick="switchQuizTab('11-5',this)" type="button">11.5</button>
+<button class="qz-tab-btn" onclick="switchQuizTab('11-6',this)" type="button">11.6</button>
 <button class="qz-tab-btn" onclick="switchQuizTab('11-7',this)" type="button">11.7</button>
 <button class="qz-tab-btn" onclick="switchQuizTab('11-8',this)" type="button">11.8</button>
 <button class="qz-tab-btn" onclick="switchQuizTab('11-sum',this)" type="button">Summary</button>
@@ -288,6 +713,9 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 </div>
 </div>
 <div id="questions-ch11-11-5"></div>
+</div>
+<div class="qz-tab-panel" id="qz-panel-11-6">
+<p style="padding:16px 4px;color:var(--muted);font-size:0.88rem;">No quiz in Coursera.</p>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-7">
 <div class="qz-panel-toolbar">
