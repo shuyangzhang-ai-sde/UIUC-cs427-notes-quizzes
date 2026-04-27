@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14.2 Size and Complexity Metrics</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f4f3f0;
+  --border: #e8e6e1;
+  --border2: #d4d1ca;
+  --text: #1c1b18;
+  --text2: #4a4840;
+  --muted: #8a8780;
+  --accent: #3d6b4f;
+  --accent-light: #edf4ef;
+  --accent2: #7c5c2e;
+  --accent2-light: #fdf4e7;
+  --blue: #2d5fa6;
+  --blue-light: #ebf1fb;
+  --red-light: #fdf0ef;
+  --red: #a63d2d;
+  --tag-bg: #f0ede8;
+  --radius: 8px;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 36px 16px 60px;
+}
+
+.container { max-width: 780px; margin: 0 auto; }
+
+header { margin-bottom: 36px; }
+header h1 {
+  font-family: 'Lora', serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.header-meta {
+  margin-top: 6px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  color: var(--muted);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-meta span {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 32px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 500;
+  padding: 9px 16px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+.tab-btn:hover:not(.active) { color: var(--text2); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  margin-bottom: 16px;
+}
+.card:hover { border-color: var(--border2); }
+
+.card-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-family: 'Lora', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.35;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.kw {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 9px;
+  color: var(--text2);
+}
+.kw.green { background: var(--accent-light); border-color: #b8d4c0; color: var(--accent); }
+.kw.blue { background: var(--blue-light); border-color: #b0c8e8; color: var(--blue); }
+.kw.amber { background: var(--accent2-light); border-color: #e0c898; color: var(--accent2); }
+.kw.red { background: var(--red-light); border-color: #e0b8b0; color: var(--red); }
+
+.card-body {
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.card-body:last-child { margin-bottom: 0; }
+
+.hl { color: var(--text); font-weight: 600; }
+.hl-green { color: var(--accent); font-weight: 600; }
+.hl-blue { color: var(--blue); font-weight: 600; }
+.hl-amber { color: var(--accent2); font-weight: 600; }
+.hl-red { color: var(--red); font-weight: 600; }
+
+.blist { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.blist:last-child { margin-bottom: 0; }
+.blist li {
+  font-size: 0.88rem;
+  color: var(--text2);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.6;
+}
+.blist li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--border2);
+  font-size: 0.75rem;
+  top: 3px;
+}
+
+.tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+.tbl-wrap:last-child { margin-bottom: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+th {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  background: var(--surface2);
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  line-height: 1.5;
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+.note-box {
+  background: var(--accent2-light);
+  border-left: 3px solid #d4a866;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.note-box .note-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent2);
+  margin-bottom: 4px;
+}
+
+.green-box {
+  background: var(--accent-light);
+  border-left: 3px solid #7ab892;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.green-box .note-label { color: var(--accent); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.blue-box {
+  background: var(--blue-light);
+  border-left: 3px solid #7aaad6;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.blue-box .note-label { color: var(--blue); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.red-box {
+  background: var(--red-light);
+  border-left: 3px solid #e0a898;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.red-box .note-label { color: var(--red); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+.summary-cell {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.summary-cell .sc-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.summary-cell .sc-val {
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.complexity-bar-wrap { margin: 16px 0 4px; }
+.complexity-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.83rem;
+}
+.complexity-row .cr-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.78rem;
+  width: 80px;
+  flex-shrink: 0;
+  color: var(--text2);
+}
+.complexity-row .cr-bar {
+  height: 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.complexity-row .cr-desc {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Software Engineering — Size &amp; Complexity Metrics</h1>
+    <div class="header-meta">
+      <span>Chapter 14.2</span>
+      <span>Size and Complexity Metrics</span>
+      <span>Coursera</span>
+    </div>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('loc', this)">LOC</button>
+    <button class="tab-btn" onclick="switchTab('cyclomatic', this)">Cyclomatic Complexity</button>
+    <button class="tab-btn" onclick="switchTab('compare', this)">Comparison</button>
+  </nav>
+
+  <!-- Tab 1: Overview -->
+  <div id="tab-overview" class="tab-panel active">
+
+    <div class="card">
+      <div class="card-label">概念</div>
+      <div class="card-title">Why Measure Code?</div>
+      <div class="keywords">
+        <span class="kw green">Size Metrics</span>
+        <span class="kw blue">Complexity Metrics</span>
+        <span class="kw">Code Quality</span>
+        <span class="kw">Maintainability</span>
+        <span class="kw">Fault-Proneness</span>
+      </div>
+      <div class="card-body">
+        Code metrics quantify properties of source code to help engineers assess <span class="hl">quality</span>, predict <span class="hl-red">fault-proneness</span>, and guide refactoring decisions. They fall into two broad categories: <span class="hl-green">size metrics</span> and <span class="hl-blue">complexity metrics</span>.
+      </div>
+      <div class="summary-grid">
+        <div class="summary-cell">
+          <div class="sc-label">Size Metrics</div>
+          <div class="sc-val">How large is the code?</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label">Complexity Metrics</div>
+          <div class="sc-val">How hard is the code to understand &amp; test?</div>
+        </div>
+      </div>
+      <div class="note-box" style="margin-top:16px;">
+        <div class="note-label">Key Distinction</div>
+        <strong>Cyclomatic Complexity is NOT a size metric.</strong> It measures structural complexity (control flow), while LOC, number of methods, and number of classes measure size.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">分类总览</div>
+      <div class="card-title">Metrics at a Glance</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Metric</th><th>Category</th><th>What It Counts</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Lines of Code (LOC)</td><td><span class="hl-green">Size</span></td><td>Number of lines in the source file</td></tr>
+            <tr><td>Number of Methods</td><td><span class="hl-green">Size</span></td><td>Total methods / functions defined</td></tr>
+            <tr><td>Number of Classes</td><td><span class="hl-green">Size</span></td><td>Total class definitions in codebase</td></tr>
+            <tr><td>Cyclomatic Complexity</td><td><span class="hl-blue">Complexity</span></td><td>Number of independent paths through code</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 2: LOC -->
+  <div id="tab-loc" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Size Metric</div>
+      <div class="card-title">Lines of Code (LOC)</div>
+      <div class="keywords">
+        <span class="kw green">LOC</span>
+        <span class="kw">SLOC</span>
+        <span class="kw">Size</span>
+        <span class="kw amber">Limitations</span>
+      </div>
+      <div class="card-body">
+        LOC (or SLOC — Source Lines of Code) is the most straightforward size metric: simply count the number of lines in a source file. It is easy to collect automatically, but comes with significant <span class="hl-amber">limitations</span>.
+      </div>
+      <ul class="blist">
+        <li>Easy to measure automatically with tooling</li>
+        <li>Useful as a rough proxy for project scope or effort estimation</li>
+        <li>Can be compared across versions of the same codebase to track growth</li>
+      </ul>
+      <hr class="divider">
+      <div class="card-label" style="margin-bottom:10px;">Limitations</div>
+      <ul class="blist">
+        <li>More lines ≠ better code — verbose styles inflate LOC without adding value</li>
+        <li>A skilled refactor can cut LOC in half while <em>improving</em> quality</li>
+        <li>Does not capture code structure, readability, or logic complexity</li>
+        <li>Different languages have very different LOC for equivalent functionality</li>
+      </ul>
+      <div class="red-box">
+        <div class="note-label">Quiz Trap</div>
+        <strong>LOC is NOT always a reliable indicator of quality or complexity.</strong> High LOC can mean redundant code; low LOC can mean unreadable one-liners. Always consider LOC alongside other metrics.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Other Size Metrics</div>
+      <div class="card-title">Number of Methods &amp; Classes</div>
+      <div class="keywords">
+        <span class="kw green">Number of Methods</span>
+        <span class="kw green">Number of Classes</span>
+        <span class="kw">OOP</span>
+        <span class="kw">Modularity</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Metric</th><th>Measures</th><th>Use Case</th></tr></thead>
+          <tbody>
+            <tr><td>Number of Methods</td><td>Breadth of functionality per class</td><td>Detect bloated classes (God Object)</td></tr>
+            <tr><td>Number of Classes</td><td>Overall structural decomposition</td><td>Track modularity of the system</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="blue-box">
+        <div class="note-label">Note</div>
+        Both are <strong>size metrics</strong> — they describe how large or decomposed the codebase is, not how complex the logic within each unit is.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 3: Cyclomatic Complexity -->
+  <div id="tab-cyclomatic" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Complexity Metric</div>
+      <div class="card-title">Cyclomatic Complexity</div>
+      <div class="keywords">
+        <span class="kw blue">Cyclomatic Complexity</span>
+        <span class="kw">Control Flow</span>
+        <span class="kw">Independent Paths</span>
+        <span class="kw red">Fault-Prone</span>
+        <span class="kw">Testability</span>
+      </div>
+      <div class="card-body">
+        Proposed by Thomas McCabe (1976), Cyclomatic Complexity (CC) measures the number of <span class="hl-blue">linearly independent paths</span> through a method's control flow graph. It directly reflects how many different execution paths a tester must cover.
+      </div>
+      <div class="card-body">
+        <strong>Formula:</strong> <span class="hl">CC = E − N + 2P</span> where E = edges, N = nodes, P = connected components (usually 1 method → P=1).
+      </div>
+      <div class="card-body">
+        Practically: CC ≈ <strong>number of decision points</strong> (if, else if, while, for, case, &&, ||, ?) <strong>+ 1</strong>.
+      </div>
+
+      <hr class="divider">
+      <div class="card-label" style="margin-bottom: 12px;">Complexity Thresholds</div>
+      <div class="complexity-bar-wrap">
+        <div class="complexity-row">
+          <span class="cr-label">1 – 5</span>
+          <div class="cr-bar" style="width:60px; background:#7ab892;"></div>
+          <span class="cr-desc" style="color:var(--accent);">Simple, easy to test ✓</span>
+        </div>
+        <div class="complexity-row">
+          <span class="cr-label">6 – 10</span>
+          <div class="cr-bar" style="width:100px; background:#d4a866;"></div>
+          <span class="cr-desc" style="color:var(--accent2);">Moderate complexity</span>
+        </div>
+        <div class="complexity-row">
+          <span class="cr-label">&gt; 10</span>
+          <div class="cr-bar" style="width:160px; background:#c07060;"></div>
+          <span class="cr-desc" style="color:var(--red);">Hard to test, fault-prone ✗</span>
+        </div>
+      </div>
+
+      <div class="note-box">
+        <div class="note-label">Quiz Point</div>
+        A method with CC <strong>&gt; 10</strong> is considered <strong>hard to test and fault-prone</strong>. This threshold is widely accepted in industry and academia (McCabe's original guideline).
+      </div>
+      <div class="green-box" style="margin-top:10px;">
+        <div class="note-label">One-Sentence Summary</div>
+        Cyclomatic Complexity tells you the <strong>minimum number of test cases</strong> needed to cover every branch in a method — higher CC = more tests needed = higher risk.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">示例</div>
+      <div class="card-title">Calculating CC — Quick Example</div>
+      <div class="keywords">
+        <span class="kw">if</span>
+        <span class="kw">else</span>
+        <span class="kw">while</span>
+        <span class="kw blue">Decision Points</span>
+      </div>
+      <div class="card-body">
+        Count every branching keyword as one decision point, then add 1:
+      </div>
+      <ul class="blist">
+        <li>A straight-line method with no branches → CC = <strong>1</strong></li>
+        <li>One <code>if</code> statement → CC = <strong>2</strong></li>
+        <li>One <code>if</code> + one <code>while</code> → CC = <strong>3</strong></li>
+        <li>Ten nested <code>if / else if</code> → CC = <strong>11</strong> → <span class="hl-red">refactor recommended</span></li>
+      </ul>
+      <div class="blue-box">
+        <div class="note-label">Why It Matters</div>
+        High CC methods are hard to reason about, hard to test completely, and statistically more likely to contain bugs. Refactoring (Extract Method, Replace Conditional with Polymorphism) can reduce CC.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 4: Comparison -->
+  <div id="tab-compare" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">对比总结</div>
+      <div class="card-title">Size Metrics vs. Complexity Metrics</div>
+      <div class="keywords">
+        <span class="kw green">Size</span>
+        <span class="kw blue">Complexity</span>
+        <span class="kw">Trade-off</span>
+        <span class="kw">Code Quality</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Dimension</th><th>Size Metrics</th><th>Complexity Metrics</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Examples</td><td>LOC, # Methods, # Classes</td><td>Cyclomatic Complexity</td></tr>
+            <tr><td>What they answer</td><td>"How big is the code?"</td><td>"How hard is it to test / understand?"</td></tr>
+            <tr><td>Captures logic?</td><td>No</td><td>Yes — control flow branching</td></tr>
+            <tr><td>Language-neutral?</td><td>Partially (LOC varies)</td><td>Yes — based on structure</td></tr>
+            <tr><td>Refactoring signal</td><td>Bloated classes / files</td><td>Hard-to-test methods</td></tr>
+            <tr><td>Reliability for quality</td><td>Limited (LOC not always reliable)</td><td>Stronger (CC > 10 = risk)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">考点总结</div>
+      <div class="card-title">Exam Traps — Know These Cold</div>
+      <div class="keywords">
+        <span class="kw red">Common Mistakes</span>
+        <span class="kw amber">Quiz Focus</span>
+      </div>
+      <ul class="blist">
+        <li><strong>Cyclomatic Complexity is NOT a size metric</strong> — it is a structural complexity metric. LOC, # methods, # classes are size metrics.</li>
+        <li><strong>LOC is NOT always reliable</strong> for measuring quality or complexity — more lines can mean verbosity, not value.</li>
+        <li><strong>CC &gt; 10</strong> is the threshold for "hard to test and fault-prone" — this is a standard industry guideline, not just a suggestion.</li>
+      </ul>
+      <div class="note-box">
+        <div class="note-label">Quick Memory Aid</div>
+        <strong>Size metrics = What you can count by scanning</strong> (lines, methods, classes). <strong>Complexity metric = What you can only find by reading the logic</strong> (branches, paths).
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

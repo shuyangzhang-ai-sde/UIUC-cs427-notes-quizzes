@@ -129,11 +129,120 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 </header>
 <nav class="tab-nav">
 <button class="tab-btn active" onclick="switchTab('summary',this)" type="button">Summary</button>
+<button class="tab-btn" onclick="switchTab('14-1-overview',this)" type="button">14.1 Overview</button>
+<button class="tab-btn" onclick="switchTab('14-2-size-complexity',this)" type="button">14.2 Size &amp; Complexity</button>
 <button class="tab-btn" onclick="switchTab('14-3-metrics',this)" type="button">14.3 OO Metrics</button>
 <button class="tab-btn" onclick="switchTab('14-4-refactoring',this)" type="button">14.4 Refactoring</button>
 <button class="tab-btn" onclick="switchTab('14-5-example-refactoring',this)" type="button">14.5 Example Refactoring</button>
 <button class="tab-btn" onclick="switchTab('14-6-code-smells',this)" type="button">14.6 Code Smells</button>
 </nav>
+<div class="tab-panel" id="tab-14-1-overview">
+<div class="card">
+<div class="card-title">14.1 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Software Maintenance</span><span class="kw blue">4 Types</span><span class="kw amber">Adaptive</span><span class="kw red">Corrective</span><span class="kw">Testing</span></div>
+<ul class="blist">
+<li>Identify the <strong>four software maintenance types</strong> and avoid common distractors.</li>
+<li>Distinguish <strong>adaptive</strong> from corrective maintenance scenarios.</li>
+<li>Explain why corrective maintenance needs <strong>reproduce-fix-regression</strong> testing.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">From Release to Maintenance</div>
+<div class="keywords"><span class="kw">Post-release</span><span class="kw">Evolution</span><span class="kw">SDLC</span><span class="kw green">Maintenance</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Topic</th><th>What to remember</th></tr></thead>
+<tbody>
+<tr><td>Definition</td><td>Software maintenance means modifying software <strong>after release</strong> to keep it correct, compatible, and maintainable over time.</td></tr>
+<tr><td>Scope</td><td>Includes bug fixes, environment adaptation, feature/performance improvements, and prevention-oriented cleanup.</td></tr>
+<tr><td>Exam angle</td><td>The official four types are <strong>Corrective, Adaptive, Perfective, Preventive</strong>; "Proactive" is a distractor label.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Program maintenance</div>The maintenance stage is not just bug fixing - it is continuous software evolution after deployment.</div>
+</div>
+<div class="card">
+<div class="card-title">The Four Maintenance Types</div>
+<div class="keywords"><span class="kw red">Corrective</span><span class="kw amber">Adaptive</span><span class="kw green">Perfective</span><span class="kw blue">Preventive</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Type</th><th>Primary goal</th><th>Typical trigger</th></tr></thead>
+<tbody>
+<tr><td>Corrective</td><td>Fix defects/failures</td><td>Bug report, crash, wrong output</td></tr>
+<tr><td>Adaptive</td><td>Keep compatibility</td><td>OS/API/hardware/regulation changes</td></tr>
+<tr><td>Perfective</td><td>Improve functionality/performance</td><td>User or product enhancement requests</td></tr>
+<tr><td>Preventive</td><td>Reduce future risk/debt</td><td>Maintainability and reliability concerns</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam Tip</div><strong>Proactive</strong> is not one of the official four maintenance types. The four are Corrective, Adaptive, Perfective, and Preventive.</div>
+</div>
+<div class="card">
+<div class="card-title">Adaptive vs Corrective + Testing Needs</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Question</th><th>Corrective</th><th>Adaptive</th></tr></thead>
+<tbody>
+<tr><td>What changed?</td><td>Code had a defect</td><td>External environment changed</td></tr>
+<tr><td>Was software previously correct?</td><td>No (fault existed)</td><td>Usually yes, now incompatible</td></tr>
+<tr><td>Example</td><td>Null-pointer crash fix</td><td>Update for new OS or API version</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">True / False Focus</div>"Adaptive maintenance is performed to adjust software to a changed or changing environment." is <strong>True</strong>.</div>
+<ul class="blist">
+<li>Reproduce the original failure in a controlled setup.</li>
+<li>Apply the fix and verify the specific issue is resolved.</li>
+<li>Run regression checks to ensure no new defects were introduced.</li>
+</ul>
+<div class="red-box"><div class="note-label">Exam Trap</div>Corrective maintenance testing is <strong>not</strong> "new feature only" testing and should <strong>never</strong> be skipped just because a change appears minor.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-14-2-size-complexity">
+<div class="card">
+<div class="card-title">14.2 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Size Metrics</span><span class="kw blue">Complexity Metrics</span><span class="kw amber">LOC</span><span class="kw red">Cyclomatic Complexity</span></div>
+<ul class="blist">
+<li>Distinguish <strong>size</strong> metrics from <strong>complexity</strong> metrics.</li>
+<li>Explain why <strong>Cyclomatic Complexity</strong> is not a size metric.</li>
+<li>Interpret CC thresholds, especially why <strong>CC &gt; 10</strong> signals high testing risk.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Size vs Complexity Metrics</div>
+<div class="keywords"><span class="kw green">LOC</span><span class="kw green">#Methods</span><span class="kw green">#Classes</span><span class="kw blue">CC</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Metric</th><th>Category</th><th>What it captures</th></tr></thead>
+<tbody>
+<tr><td>Lines of Code (LOC)</td><td>Size</td><td>Amount of source lines</td></tr>
+<tr><td>Number of Methods</td><td>Size</td><td>How many methods/functions are defined</td></tr>
+<tr><td>Number of Classes</td><td>Size</td><td>How many class units exist</td></tr>
+<tr><td>Cyclomatic Complexity</td><td>Complexity</td><td>Number of independent control-flow paths</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam tip</div><strong>Cyclomatic Complexity is NOT a size metric</strong>; it measures logical branching complexity.</div>
+</div>
+<div class="card">
+<div class="card-title">LOC Limitations and CC Thresholds</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Statement</th><th>Verdict</th><th>Reason</th></tr></thead>
+<tbody>
+<tr><td>LOC is always reliable for quality/complexity</td><td>False</td><td>Code can be long but simple, or short but hard to understand.</td></tr>
+<tr><td>Method with CC &gt; 10 is hard to test and fault-prone</td><td>True</td><td>More branches increase paths and test burden.</td></tr>
+</tbody>
+</table>
+</div>
+<ul class="blist">
+<li>LOC is useful for rough sizing, but not sufficient for quality judgment.</li>
+<li>CC approximates independent execution paths and test difficulty.</li>
+<li>Refactor high-CC methods to reduce risk and improve testability.</li>
+</ul>
+<div class="green-box"><div class="note-label">Quick memory aid</div><strong>Size metrics</strong> tell how much code you have; <strong>complexity metrics</strong> tell how hard that code is to reason about and test.</div>
+</div>
+</div>
 <div class="tab-panel" id="tab-14-3-metrics">
 <div class="card">
 <div class="card-title">14.3 Learning Objectives</div>
@@ -472,11 +581,13 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 <div class="tab-panel active" id="tab-summary">
 <div class="card">
 <div class="card-title">Chapter 14 Study Tabs</div>
-<div class="card-body">Use the tabs above to switch among <strong>14.3 Object-Oriented Metrics</strong>, <strong>14.4 Refactoring</strong>, <strong>14.5 Example Refactoring</strong>, and <strong>14.6 Code Smells</strong>. The right-side quiz pane automatically follows the selected note tab (Week 11 style behavior).</div>
+<div class="card-body">Use the tabs above to switch among <strong>14.1 Overview</strong>, <strong>14.2 Size &amp; Complexity</strong>, <strong>14.3 Object-Oriented Metrics</strong>, <strong>14.4 Refactoring</strong>, <strong>14.5 Example Refactoring</strong>, and <strong>14.6 Code Smells</strong>. The right-side quiz pane automatically follows the selected note tab (Week 11 style behavior).</div>
 </div>
 <div class="card">
 <div class="card-title">Included in Week 14</div>
 <ul class="blist">
+<li><strong>14.1 Notes + Quiz</strong> moved into this page.</li>
+<li><strong>14.2 Notes + Quiz</strong> moved into this page.</li>
 <li><strong>14.3 Notes + Quiz</strong> moved into this page.</li>
 <li><strong>14.4 Notes + Quiz</strong> moved into this page.</li>
 <li><strong>14.5 Notes + Quiz</strong> moved into this page.</li>
@@ -490,6 +601,24 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 <div class="qz-wrap">
 <div class="qz-header">
 <h2>Chapter 14 — quiz</h2>
+</div>
+<div class="qz-tab-panel" id="qz-panel-14-1">
+<div class="qz-panel-toolbar">
+<div class="qz-actions">
+<button class="qz-reset" onclick="resetQuizCh14_14_1()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-ch14-14-1">— / 3</span></div>
+</div>
+</div>
+<div id="questions-ch14-14-1"></div>
+</div>
+<div class="qz-tab-panel" id="qz-panel-14-2">
+<div class="qz-panel-toolbar">
+<div class="qz-actions">
+<button class="qz-reset" onclick="resetQuizCh14_14_2()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-ch14-14-2">— / 3</span></div>
+</div>
+</div>
+<div id="questions-ch14-14-2"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-14-3">
 <div class="qz-panel-toolbar">
@@ -536,6 +665,8 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 </div>
 <script>
 var NOTE_TO_QUIZ = {
+  '14-1-overview': '14-1',
+  '14-2-size-complexity': '14-2',
   '14-3-metrics': '14-3',
   '14-4-refactoring': '14-4',
   '14-5-example-refactoring': '14-5',
@@ -561,6 +692,12 @@ function switchTab(id, btn) {
 <script src="../js/quiz-pane.js"></script>
 <script>
 var CH14_RAW_QUESTIONS = [
+  { q: '[14.1] Which of the following is NOT one of the four types of software maintenance?', opts: ['Corrective', 'Preventive', 'Adaptive', 'Proactive'], ans: 3, exp: 'The four types are Corrective, Adaptive, Perfective, and Preventive. Proactive is a distractor.' },
+  { q: '[14.1] True or False: Adaptive maintenance is performed to adjust software to a changed or changing environment.', opts: ['True', 'False'], ans: 0, exp: 'Adaptive maintenance addresses changes in external environment such as platform/API/regulation shifts.' },
+  { q: '[14.1] Which statement is true about testing needs for corrective maintenance?', opts: ['Only verify new features', 'Reproduce failure, confirm fix, and check for regressions', 'No testing needed for minor changes', 'Focus only on UI usability tests'], ans: 1, exp: 'Corrective maintenance requires failure reproduction, fix verification, and regression testing.' },
+  { q: '[14.2] Which of the following is NOT a metric for measuring code size?', opts: ['Number of lines', 'Number of methods', 'Number of classes', 'Cyclomatic complexity'], ans: 3, exp: 'Cyclomatic Complexity measures control-flow complexity, not size.' },
+  { q: '[14.2] True or False: A method with cyclomatic complexity greater than 10 is considered hard to test and fault-prone.', opts: ['True', 'False'], ans: 0, exp: 'CC > 10 is a common threshold indicating high testing burden and defect risk.' },
+  { q: '[14.2] True or False: Lines of Code (LOC) is always a reliable indicator of code quality and complexity.', opts: ['True', 'False'], ans: 1, exp: 'LOC is useful for rough sizing, but quality/complexity require additional metrics.' },
   { q: '[14.3] Which OO metric measures the sum of method complexities in a class?', opts: ['Depth of Inheritance Tree (DIT)', 'Weighted Methods Per Class (WMC)', 'Coupling between Object Classes (CBO)', 'Number of Children (NOC)'], ans: 1, exp: 'WMC sums method complexities for a class.' },
   { q: '[14.3] True or False: Higher CBO makes a class easier to test and more reusable.', opts: ['True', 'False'], ans: 1, exp: 'Higher coupling generally reduces testability and reusability.' },
   { q: '[14.3] Which statement about DIT is true?', opts: ['Higher DIT makes behavior easier to predict.', 'Higher DIT means more reuse but harder-to-predict behavior and higher complexity.', 'DIT only considers single inheritance and ignores multiple inheritance.', 'DIT is unrelated to class complexity.'], ans: 1, exp: 'Higher DIT can increase reuse but also increases complexity and predictability challenges.' },
@@ -602,27 +739,41 @@ function ch14Mount(cfg) {
 
 ch14Mount({
   questions: ch14Slice(0, 3),
+  containerId: 'questions-ch14-14-1',
+  scoreId: 'score-ch14-14-1',
+  idPrefix: 'ch14m14-1-',
+  resetGlobalName: 'resetQuizCh14_14_1'
+});
+ch14Mount({
+  questions: ch14Slice(3, 6),
+  containerId: 'questions-ch14-14-2',
+  scoreId: 'score-ch14-14-2',
+  idPrefix: 'ch14m14-2-',
+  resetGlobalName: 'resetQuizCh14_14_2'
+});
+ch14Mount({
+  questions: ch14Slice(6, 9),
   containerId: 'questions-ch14-14-3',
   scoreId: 'score-ch14-14-3',
   idPrefix: 'ch14m14-3-',
   resetGlobalName: 'resetQuizCh14_14_3'
 });
 ch14Mount({
-  questions: ch14Slice(3, 6),
+  questions: ch14Slice(9, 12),
   containerId: 'questions-ch14-14-4',
   scoreId: 'score-ch14-14-4',
   idPrefix: 'ch14m14-4-',
   resetGlobalName: 'resetQuizCh14_14_4'
 });
 ch14Mount({
-  questions: ch14Slice(6, 9),
+  questions: ch14Slice(12, 15),
   containerId: 'questions-ch14-14-5',
   scoreId: 'score-ch14-14-5',
   idPrefix: 'ch14m14-5-',
   resetGlobalName: 'resetQuizCh14_14_5'
 });
 ch14Mount({
-  questions: ch14Slice(9, 12),
+  questions: ch14Slice(15, 18),
   containerId: 'questions-ch14-14-6',
   scoreId: 'score-ch14-14-6',
   idPrefix: 'ch14m14-6-',

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14.1 Software Maintenance Notes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f4f3f0;
+  --border: #e8e6e1;
+  --border2: #d4d1ca;
+  --text: #1c1b18;
+  --text2: #4a4840;
+  --muted: #8a8780;
+  --accent: #3d6b4f;
+  --accent-light: #edf4ef;
+  --accent2: #7c5c2e;
+  --accent2-light: #fdf4e7;
+  --blue: #2d5fa6;
+  --blue-light: #ebf1fb;
+  --red-light: #fdf0ef;
+  --red: #a63d2d;
+  --tag-bg: #f0ede8;
+  --radius: 8px;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 36px 16px 60px;
+}
+
+.container { max-width: 780px; margin: 0 auto; }
+
+header { margin-bottom: 36px; }
+header h1 {
+  font-family: 'Lora', serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.header-meta {
+  margin-top: 6px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  color: var(--muted);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-meta span {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 32px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 500;
+  padding: 9px 16px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+.tab-btn:hover:not(.active) { color: var(--text2); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  margin-bottom: 16px;
+}
+.card:hover { border-color: var(--border2); }
+
+.card-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-family: 'Lora', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.35;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.kw {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 9px;
+  color: var(--text2);
+}
+.kw.green { background: var(--accent-light); border-color: #b8d4c0; color: var(--accent); }
+.kw.blue { background: var(--blue-light); border-color: #b0c8e8; color: var(--blue); }
+.kw.amber { background: var(--accent2-light); border-color: #e0c898; color: var(--accent2); }
+.kw.red { background: var(--red-light); border-color: #e0b8b0; color: var(--red); }
+
+.card-body {
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.card-body:last-child { margin-bottom: 0; }
+
+.hl { color: var(--text); font-weight: 600; }
+.hl-green { color: var(--accent); font-weight: 600; }
+.hl-blue { color: var(--blue); font-weight: 600; }
+.hl-amber { color: var(--accent2); font-weight: 600; }
+.hl-red { color: var(--red); font-weight: 600; }
+
+.blist { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.blist:last-child { margin-bottom: 0; }
+.blist li {
+  font-size: 0.88rem;
+  color: var(--text2);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.6;
+}
+.blist li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--border2);
+  font-size: 0.75rem;
+  top: 3px;
+}
+
+.tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+.tbl-wrap:last-child { margin-bottom: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+th {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  background: var(--surface2);
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  line-height: 1.5;
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+.note-box {
+  background: var(--accent2-light);
+  border-left: 3px solid #d4a866;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.note-box .note-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent2);
+  margin-bottom: 4px;
+}
+
+.green-box {
+  background: var(--accent-light);
+  border-left: 3px solid #7ab892;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.green-box .note-label { color: var(--accent); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.blue-box {
+  background: var(--blue-light);
+  border-left: 3px solid #7aaad6;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.blue-box .note-label { color: var(--blue); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+.summary-cell {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.summary-cell .sc-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.summary-cell .sc-val {
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.summary-cell .sc-sub {
+  font-size: 0.8rem;
+  color: var(--text2);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Software Engineering — Chapter 14.1</h1>
+    <div class="header-meta">
+      <span>Module 14</span>
+      <span>Software Maintenance Overview</span>
+      <span>Coursera</span>
+    </div>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('types', this)">4 Types</button>
+    <button class="tab-btn" onclick="switchTab('corrective', this)">Corrective</button>
+    <button class="tab-btn" onclick="switchTab('adaptive', this)">Adaptive</button>
+  </nav>
+
+  <!-- Tab 1: Overview -->
+  <div id="tab-overview" class="tab-panel active">
+
+    <div class="card">
+      <div class="card-label">Definition</div>
+      <div class="card-title">What is Software Maintenance?</div>
+      <div class="keywords">
+        <span class="kw green">Software Maintenance</span>
+        <span class="kw">Post-release</span>
+        <span class="kw">Evolution</span>
+        <span class="kw">SDLC</span>
+      </div>
+      <div class="card-body">
+        Software maintenance is the process of <span class="hl">modifying and updating software after its initial release</span>. It is the final — and often longest — phase of the SDLC, encompassing all work done to keep software functional, relevant, and reliable over time.
+      </div>
+      <ul class="blist">
+        <li>Maintenance typically accounts for <strong>40–80% of total software cost</strong> over a system's lifetime</li>
+        <li>It is not limited to fixing bugs — it also covers adaptation, improvement, and prevention</li>
+        <li>Every change made post-release falls into one of the four maintenance categories</li>
+      </ul>
+      <div class="green-box">
+        <div class="note-label">One-line Summary</div>
+        Software maintenance keeps software alive and useful after deployment — it is ongoing, not a one-time event.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">The Four Types — Quick Reference</div>
+      <div class="card-title">Types of Software Maintenance</div>
+      <div class="keywords">
+        <span class="kw red">Corrective</span>
+        <span class="kw amber">Adaptive</span>
+        <span class="kw green">Perfective</span>
+        <span class="kw blue">Preventive</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-cell">
+          <div class="sc-label" style="color: var(--red);">Corrective</div>
+          <div class="sc-val">Fix bugs &amp; failures</div>
+          <div class="sc-sub">Reactive — something broke</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label" style="color: var(--accent2);">Adaptive</div>
+          <div class="sc-val">Adjust to new environment</div>
+          <div class="sc-sub">Reactive — environment changed</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label" style="color: var(--accent);">Perfective</div>
+          <div class="sc-val">Add / improve features</div>
+          <div class="sc-sub">Proactive — user requests</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label" style="color: var(--blue);">Preventive</div>
+          <div class="sc-val">Improve maintainability</div>
+          <div class="sc-sub">Proactive — future stability</div>
+        </div>
+      </div>
+      <div class="note-box">
+        <div class="note-label">Exam Alert</div>
+        <strong>"Proactive" is NOT one of the four types.</strong> The four types are: Corrective, Adaptive, Perfective, and Preventive. "Proactive" is a common distractor — don't confuse it with Preventive maintenance.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 2: 4 Types Detail -->
+  <div id="tab-types" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Comparison</div>
+      <div class="card-title">All Four Types Side-by-Side</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Type</th><th>Trigger</th><th>Goal</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color: var(--red);">Corrective</td>
+              <td>Bug / failure discovered</td>
+              <td>Restore correct behavior</td>
+              <td>Fix a crash when user submits a form</td>
+            </tr>
+            <tr>
+              <td style="color: var(--accent2);">Adaptive</td>
+              <td>Environment changes</td>
+              <td>Keep software compatible</td>
+              <td>Update app for new OS version or new API</td>
+            </tr>
+            <tr>
+              <td style="color: var(--accent);">Perfective</td>
+              <td>New user requirements</td>
+              <td>Enhance functionality / performance</td>
+              <td>Add dark mode; optimize slow queries</td>
+            </tr>
+            <tr>
+              <td style="color: var(--blue);">Preventive</td>
+              <td>Technical debt / risk</td>
+              <td>Improve future maintainability</td>
+              <td>Refactor legacy code; update documentation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="blue-box">
+        <div class="note-label">Reactive vs. Proactive</div>
+        <strong>Reactive:</strong> Corrective &amp; Adaptive — respond to existing problems or changes.<br>
+        <strong>Proactive:</strong> Perfective &amp; Preventive — anticipate future needs before problems arise.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Common Confusions</div>
+      <div class="card-title">Distinguishing the Types</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Scenario</th><th>Type</th><th>Why</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Login fails after database upgrade</td>
+              <td style="color:var(--accent2);">Adaptive</td>
+              <td>Environment (DB) changed, not a pre-existing bug</td>
+            </tr>
+            <tr>
+              <td>Login crashes due to null pointer bug</td>
+              <td style="color:var(--red);">Corrective</td>
+              <td>Existing defect causing failure</td>
+            </tr>
+            <tr>
+              <td>Refactor code to reduce complexity</td>
+              <td style="color:var(--blue);">Preventive</td>
+              <td>No failure yet — improving future maintainability</td>
+            </tr>
+            <tr>
+              <td>User requests a search filter feature</td>
+              <td style="color:var(--accent);">Perfective</td>
+              <td>New functional enhancement requested</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 3: Corrective -->
+  <div id="tab-corrective" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Type: Corrective Maintenance</div>
+      <div class="card-title">Fixing Bugs and Failures</div>
+      <div class="keywords">
+        <span class="kw red">Corrective</span>
+        <span class="kw">Bug Fix</span>
+        <span class="kw">Defect</span>
+        <span class="kw">Failure Reproduction</span>
+        <span class="kw">Regression Testing</span>
+      </div>
+      <div class="card-body">
+        Corrective maintenance addresses <span class="hl-red">defects and failures</span> discovered after release. It is <span class="hl">reactive</span> — the software has broken or produced incorrect output, and the team must diagnose and repair it.
+      </div>
+      <ul class="blist">
+        <li><strong>Step 1 — Reproduce:</strong> Replicate the failure in a controlled environment to understand it</li>
+        <li><strong>Step 2 — Diagnose:</strong> Trace the fault to its root cause in the code</li>
+        <li><strong>Step 3 — Fix:</strong> Apply the code change to correct the defect</li>
+        <li><strong>Step 4 — Confirm:</strong> Verify the fix resolves the original failure</li>
+        <li><strong>Step 5 — Regression test:</strong> Ensure no new issues were introduced by the fix</li>
+      </ul>
+      <div class="note-box">
+        <div class="note-label">Key Exam Point — Testing for Corrective Maintenance</div>
+        Testing for corrective maintenance must: <strong>(1) reproduce the failure</strong>, <strong>(2) confirm the fix works</strong>, and <strong>(3) ensure no new issues were introduced (regression testing)</strong>. It is NOT limited to new features, UI testing, or skipped for minor changes.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Testing Requirements</div>
+      <div class="card-title">Why Corrective Maintenance Needs Thorough Testing</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Testing Goal</th><th>Purpose</th><th>Required?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Reproduce the failure</td>
+              <td>Confirm you can trigger the original bug</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes</td>
+            </tr>
+            <tr>
+              <td>Confirm the fix</td>
+              <td>Verify the defect no longer occurs</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes</td>
+            </tr>
+            <tr>
+              <td>Regression testing</td>
+              <td>Ensure the fix didn't break other parts</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes</td>
+            </tr>
+            <tr>
+              <td>New feature testing only</td>
+              <td>Not applicable — no new features added</td>
+              <td style="color:var(--red); font-weight:600;">✗ No</td>
+            </tr>
+            <tr>
+              <td>Skip testing for minor changes</td>
+              <td>Even small fixes can break things</td>
+              <td style="color:var(--red); font-weight:600;">✗ Never</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="green-box">
+        <div class="note-label">One-line Summary</div>
+        Corrective maintenance testing = reproduce → fix → verify → regression check. All three steps are mandatory.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 4: Adaptive -->
+  <div id="tab-adaptive" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Type: Adaptive Maintenance</div>
+      <div class="card-title">Adjusting to a Changing Environment</div>
+      <div class="keywords">
+        <span class="kw amber">Adaptive</span>
+        <span class="kw">Environment Change</span>
+        <span class="kw">OS Update</span>
+        <span class="kw">Hardware</span>
+        <span class="kw">Third-party API</span>
+        <span class="kw">Compatibility</span>
+      </div>
+      <div class="card-body">
+        Adaptive maintenance modifies software to keep it functional when <span class="hl-amber">external conditions change</span>. The software itself has no bug — the surrounding environment has shifted, requiring the software to be updated to remain compatible.
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Environment Change</th><th>Example Adaptation</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>New operating system version</td>
+              <td>Update system calls or deprecated APIs</td>
+            </tr>
+            <tr>
+              <td>New hardware platform</td>
+              <td>Recompile or adjust drivers/interfaces</td>
+            </tr>
+            <tr>
+              <td>Third-party service API change</td>
+              <td>Update integration code to new API spec</td>
+            </tr>
+            <tr>
+              <td>New legal/regulatory requirements</td>
+              <td>Add data privacy compliance features</td>
+            </tr>
+            <tr>
+              <td>Database migration</td>
+              <td>Update queries/schemas for new DB version</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-box">
+        <div class="note-label">Key Exam Point — True Statement</div>
+        <strong>"Adaptive maintenance is performed to adjust software to a changed or changing environment."</strong> — This is <strong>TRUE</strong>. The key word is environment: the software adapts to external changes, not internal defects.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Distinguishing Adaptive vs. Corrective</div>
+      <div class="card-title">Was it the Software or the Environment?</div>
+      <div class="card-body">
+        The critical question: <span class="hl">did something break because of a bug already in the code, or because something outside the software changed?</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th></th><th>Corrective</th><th>Adaptive</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Root cause</td>
+              <td>Defect in existing code</td>
+              <td>Changed external environment</td>
+            </tr>
+            <tr>
+              <td>Software was</td>
+              <td>Always broken</td>
+              <td>Working before; now incompatible</td>
+            </tr>
+            <tr>
+              <td>Trigger</td>
+              <td>Bug report / failure detected</td>
+              <td>OS upgrade, new API, new regulation</td>
+            </tr>
+            <tr>
+              <td>Nature</td>
+              <td>Reactive (fix existing fault)</td>
+              <td>Reactive (respond to external change)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="blue-box">
+        <div class="note-label">Memory Tip</div>
+        <strong>Adaptive = Adjust</strong>. The software adapts to its environment like an organism adapting to climate change — nothing was wrong before, the world around it changed.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
