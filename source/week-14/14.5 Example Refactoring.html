@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14.5 Example Refactoring — Notes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f4f3f0;
+  --border: #e8e6e1;
+  --text: #1c1b18;
+  --text2: #4a4840;
+  --muted: #8a8780;
+  --accent: #3d6b4f;
+  --accent-light: #edf4ef;
+  --accent2: #7c5c2e;
+  --accent2-light: #fdf4e7;
+  --blue: #2d5fa6;
+  --blue-light: #ebf1fb;
+  --red: #a63d2d;
+  --red-light: #fdf0ef;
+  --tag-bg: #f0ede8;
+  --radius: 8px;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 28px 16px 56px;
+}
+
+.container { max-width: 780px; margin: 0 auto; }
+
+header { margin-bottom: 24px; }
+header h1 {
+  font-family: 'Lora', serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 2px;
+  row-gap: 6px;
+  border: none;
+  margin-bottom: 24px;
+  padding-bottom: 0;
+  overflow: visible;
+}
+
+.tab-btn {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 500;
+  padding: 9px 16px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+.tab-btn:hover:not(.active) { color: var(--text2); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--surface);
+  border: none;
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  margin-bottom: 16px;
+}
+
+.card-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-family: 'Lora', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.35;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.kw {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  background: var(--tag-bg);
+  border: none;
+  border-radius: 4px;
+  padding: 3px 9px;
+  color: var(--text2);
+}
+.kw.green { background: var(--accent-light); color: var(--accent); }
+.kw.blue { background: var(--blue-light); color: var(--blue); }
+.kw.amber { background: var(--accent2-light); color: var(--accent2); }
+.kw.red { background: var(--red-light); color: var(--red); }
+
+.card-body {
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.card-body:last-child { margin-bottom: 0; }
+
+.hl { color: var(--text); font-weight: 600; }
+.hl-green { color: var(--accent); font-weight: 600; }
+.hl-blue { color: var(--blue); font-weight: 600; }
+.hl-amber { color: var(--accent2); font-weight: 600; }
+.hl-red { color: var(--red); font-weight: 600; }
+
+.blist { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.blist:last-child { margin-bottom: 0; }
+.blist li {
+  font-size: 0.88rem;
+  color: var(--text2);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.6;
+}
+.blist li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--border);
+  font-size: 0.75rem;
+  top: 3px;
+}
+
+/* Numbered steps list */
+.steps-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.steps-list:last-child { margin-bottom: 0; }
+.steps-list li {
+  font-size: 0.88rem;
+  color: var(--text2);
+  padding-left: 28px;
+  position: relative;
+  line-height: 1.6;
+}
+.steps-list li .step-num {
+  position: absolute;
+  left: 0;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 2px;
+}
+
+.tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+.tbl-wrap:last-child { margin-bottom: 0; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+th {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border: none;
+  text-align: left;
+  background: var(--surface2);
+}
+td {
+  padding: 9px 12px;
+  border: none;
+  color: var(--text2);
+  line-height: 1.5;
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+td:first-child { font-weight: 600; color: var(--text); }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+.note-box {
+  background: var(--accent2-light);
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.note-box .note-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent2);
+  margin-bottom: 4px;
+}
+
+.green-box {
+  background: var(--accent-light);
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.green-box .note-label { color: var(--accent); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.blue-box {
+  background: var(--blue-light);
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.blue-box .note-label { color: var(--blue); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.red-box {
+  background: var(--red-light);
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.red-box .note-label { color: var(--red); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+.summary-cell {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.summary-cell .sc-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.summary-cell .sc-val {
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+/* Code block */
+.code-block {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.8rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  line-height: 1.7;
+  color: var(--text2);
+  margin-bottom: 14px;
+  overflow-x: auto;
+  white-space: pre;
+}
+.code-block .c-kw { color: var(--blue); font-weight: 500; }
+.code-block .c-fn { color: var(--accent); }
+.code-block .c-cm { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Chapter 14.5 — Example Refactoring</h1>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('steps', this)">Steps</button>
+    <button class="tab-btn" onclick="switchTab('benefits', this)">Benefits</button>
+    <button class="tab-btn" onclick="switchTab('related', this)">Related Techniques</button>
+  </nav>
+
+  <!-- Tab 1: Overview -->
+  <div id="tab-overview" class="tab-panel active">
+
+    <div class="card">
+      <div class="card-label">Concept</div>
+      <div class="card-title">Introduce Parameter Object</div>
+      <div class="keywords">
+        <span class="kw green">Introduce Parameter Object</span>
+        <span class="kw">Refactoring</span>
+        <span class="kw">Parameter Group</span>
+        <span class="kw">New Class</span>
+        <span class="kw blue">Data Clumps</span>
+      </div>
+      <div class="card-body">
+        A refactoring technique that groups a set of related parameters that frequently appear together across multiple method signatures into a <span class="hl">single new class</span>. Instead of passing several individual arguments, callers pass one object that encapsulates all of them.
+      </div>
+      <div class="note-box">
+        <div class="note-label">Exam Tip</div>
+        The <strong>first step</strong> is always to <strong>make a new class</strong> for the parameter group — before touching any existing method signatures or call sites.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Motivation</div>
+      <div class="card-title">Why Use It? — Data Clumps</div>
+      <div class="keywords">
+        <span class="kw amber">Data Clumps</span>
+        <span class="kw">Code Smell</span>
+        <span class="kw">Long Parameter List</span>
+      </div>
+      <div class="card-body">
+        When you see the same group of parameters appearing together in multiple places, this is a <span class="hl-amber">code smell</span> called <span class="hl-amber">Data Clumps</span>. These parameters belong together conceptually, and creating a class for them clarifies their relationship.
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Before (Data Clump)</th><th>After (Parameter Object)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-family:'Source Code Pro',monospace; font-size:0.82rem; font-weight:400;">
+                book(startDate, endDate, startTime, endTime)
+              </td>
+              <td style="font-family:'Source Code Pro',monospace; font-size:0.82rem; font-weight:400;">
+                book(dateTimeRange)
+              </td>
+            </tr>
+            <tr>
+              <td style="font-family:'Source Code Pro',monospace; font-size:0.82rem; font-weight:400;">
+                check(startDate, endDate, startTime, endTime)
+              </td>
+              <td style="font-family:'Source Code Pro',monospace; font-size:0.82rem; font-weight:400;">
+                check(dateTimeRange)
+              </td>
+            </tr>
+            <tr>
+              <td>Multiple scattered parameters, easy to mis-order</td>
+              <td>Single cohesive object, named intent</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 2: Steps -->
+  <div id="tab-steps" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Procedure</div>
+      <div class="card-title">Steps to Perform Introduce Parameter Object</div>
+      <div class="keywords">
+        <span class="kw green">Step-by-Step</span>
+        <span class="kw">New Class</span>
+        <span class="kw">New Parameter</span>
+        <span class="kw amber">Incremental Removal</span>
+      </div>
+      <ol class="steps-list">
+        <li>
+          <span class="step-num">1</span>
+          <strong>Make a new class</strong> for the group of parameters. This is the parameter object class. Add fields and a constructor matching the parameters you want to group.
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <strong>Add a new parameter</strong> to the method whose type is the new class, while keeping all original parameters for now.
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <strong>Update all call sites</strong> to pass in the new parameter object (set to <code>null</code> initially if needed), ensuring nothing breaks yet.
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <strong>Incrementally remove each original parameter</strong>, replacing its usage inside the method body with accesses to the new object. Update all call sites after each removal.
+        </li>
+        <li>
+          <span class="step-num">5</span>
+          <strong>Check if any logic can be moved</strong> into methods of the new class — this may lead to an <span class="hl-blue">Extract Method</span> refactoring on the parameter object itself.
+        </li>
+      </ol>
+      <div class="note-box">
+        <div class="note-label">Key Order</div>
+        Step 1 (create class) → Step 2 (add new param) → Step 4 (remove old params one by one). Never remove before adding the replacement.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Order Trap</div>
+      <div class="card-title">Common Mistake — Wrong First Step</div>
+      <div class="keywords">
+        <span class="kw red">Wrong Order</span>
+        <span class="kw">First Step</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>Correct First Step?</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Make a new class</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes</td>
+              <td>You need the type before you can add it as a parameter</td>
+            </tr>
+            <tr>
+              <td>Add a new parameter</td>
+              <td style="color:var(--red); font-weight:600;">✗ No</td>
+              <td>Can't add a typed parameter before the class exists</td>
+            </tr>
+            <tr>
+              <td>Remove original parameters</td>
+              <td style="color:var(--red); font-weight:600;">✗ No</td>
+              <td>Removing before replacement breaks callers immediately</td>
+            </tr>
+            <tr>
+              <td>Replace calls with inlined code</td>
+              <td style="color:var(--red); font-weight:600;">✗ No</td>
+              <td>That is Extract Method logic, not the start of this refactoring</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 3: Benefits -->
+  <div id="tab-benefits" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Advantages</div>
+      <div class="card-title">Benefits of Introduce Parameter Object</div>
+      <div class="keywords">
+        <span class="kw green">Readability</span>
+        <span class="kw green">Maintainability</span>
+        <span class="kw green">Fewer Parameters</span>
+        <span class="kw green">Grouping</span>
+      </div>
+      <div class="summary-grid">
+        <div class="summary-cell">
+          <div class="sc-label">Fewer Parameters</div>
+          <div class="sc-val">Reduces method signature length — easier to read and call</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label">Grouped Semantics</div>
+          <div class="sc-val">Related data is explicitly grouped, communicating their relationship</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label">Readability</div>
+          <div class="sc-val">Named object at call sites makes intent clearer</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label">Maintainability</div>
+          <div class="sc-val">Add/change fields in one place instead of every method signature</div>
+        </div>
+      </div>
+      <div class="red-box">
+        <div class="note-label">NOT a Benefit — Exam Trap</div>
+        <strong>"Makes the code more difficult to understand"</strong> is listed as a distractor option. This is <strong>false</strong> — Introduce Parameter Object <em>improves</em> readability, it does not hinder it.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">True/False Statement</div>
+      <div class="card-title">After Refactoring: Should You Check for Extract Method?</div>
+      <div class="keywords">
+        <span class="kw green">TRUE</span>
+        <span class="kw blue">Extract Method</span>
+        <span class="kw">Follow-up Step</span>
+      </div>
+      <div class="card-body">
+        <span class="hl-green">TRUE.</span> After introducing a parameter object, you should review whether any logic scattered across call sites or methods can be <span class="hl">moved into the new class</span> as its own methods. This follow-up step is called <span class="hl-blue">Extract Method</span>.
+      </div>
+      <div class="green-box">
+        <div class="note-label">Why This Makes Sense</div>
+        Once related data lives in one class, behavior that <em>operates on</em> that data is a natural fit to live there too — this is a step toward better object-oriented cohesion and is the spirit of "Tell, Don't Ask."
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 4: Related Techniques -->
+  <div id="tab-related" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Related Refactorings</div>
+      <div class="card-title">Extract Method</div>
+      <div class="keywords">
+        <span class="kw blue">Extract Method</span>
+        <span class="kw">Move Behavior</span>
+        <span class="kw">Cohesion</span>
+      </div>
+      <div class="card-body">
+        <span class="hl-blue">Extract Method</span> takes a fragment of code from a method body and places it in a new, well-named method. In the context of Introduce Parameter Object, it means moving logic that works on the parameter object's data <span class="hl">into the parameter object class itself</span>.
+      </div>
+      <ul class="blist">
+        <li>Improves readability by giving a name to a block of logic</li>
+        <li>Reduces method length</li>
+        <li>Encourages placing behavior next to the data it operates on</li>
+        <li>Often a natural <strong>follow-up</strong> to Introduce Parameter Object</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Comparison</div>
+      <div class="card-title">Introduce Parameter Object vs. Related Patterns</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Technique</th><th>What It Does</th><th>Relationship</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Introduce Parameter Object</td>
+              <td>Groups related parameters into a new class</td>
+              <td>The primary technique</td>
+            </tr>
+            <tr>
+              <td>Extract Method</td>
+              <td>Moves code fragments into a new method</td>
+              <td>Follow-up: move behavior into the new class</td>
+            </tr>
+            <tr>
+              <td>Replace Inline Code with Method Call</td>
+              <td>The reverse of Extract Method — consolidates duplicated inline logic</td>
+              <td>Distinct; not the same as Introduce Parameter Object</td>
+            </tr>
+            <tr>
+              <td>Preserve Whole Object</td>
+              <td>Pass an entire object instead of extracting several values from it</td>
+              <td>Similar intent; avoids destructuring existing objects</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-box">
+        <div class="note-label">One-line Summary</div>
+        Introduce Parameter Object = create a class → add it as parameter → incrementally remove old params → optionally Extract Method to move behavior into the new class.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

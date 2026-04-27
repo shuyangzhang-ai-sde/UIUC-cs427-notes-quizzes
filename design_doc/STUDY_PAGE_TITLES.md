@@ -102,3 +102,10 @@
 - 合并页文件名由早期 `study_6_design_patterns.html` 调整为当前 **`zh/week_6_design_patterns.html`**（以仓库内实际文件为准）。
 - 导图由静态图改为 **iframe** 引用 **`mindmap_design_patterns_html.html`**。
 - 表格与分栏、Tab 区已按 **§3.1** 收紧为 **无边框**（与历史版本可能略有差异，以本文档与 `zh/week_6_design_patterns.html` 为准）。
+
+
+
+----------------
+
+1. Reference the layout of Week 11 and move the two items above—the quiz and the notes—into Week 14.
+2. Refer to the UI of 11.1 Overview and edit the UI of 14.5       

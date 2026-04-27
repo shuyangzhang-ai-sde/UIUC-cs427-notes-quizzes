@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14.4 Refactoring — Notes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f4f3f0;
+  --border: #e8e6e1;
+  --border2: #d4d1ca;
+  --text: #1c1b18;
+  --text2: #4a4840;
+  --muted: #8a8780;
+  --accent: #3d6b4f;
+  --accent-light: #edf4ef;
+  --accent2: #7c5c2e;
+  --accent2-light: #fdf4e7;
+  --blue: #2d5fa6;
+  --blue-light: #ebf1fb;
+  --red-light: #fdf0ef;
+  --red: #a63d2d;
+  --tag-bg: #f0ede8;
+  --radius: 8px;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 36px 16px 60px;
+}
+
+.container { max-width: 780px; margin: 0 auto; }
+
+header { margin-bottom: 36px; }
+header h1 {
+  font-family: 'Lora', serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.header-meta {
+  margin-top: 6px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  color: var(--muted);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-meta span {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 32px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 500;
+  padding: 9px 16px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+.tab-btn:hover:not(.active) { color: var(--text2); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  margin-bottom: 16px;
+}
+.card:hover { border-color: var(--border2); }
+
+.card-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-family: 'Lora', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.35;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.kw {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 9px;
+  color: var(--text2);
+}
+.kw.green { background: var(--accent-light); border-color: #b8d4c0; color: var(--accent); }
+.kw.blue { background: var(--blue-light); border-color: #b0c8e8; color: var(--blue); }
+.kw.amber { background: var(--accent2-light); border-color: #e0c898; color: var(--accent2); }
+
+.card-body {
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.card-body:last-child { margin-bottom: 0; }
+
+.hl { color: var(--text); font-weight: 600; }
+.hl-green { color: var(--accent); font-weight: 600; }
+.hl-blue { color: var(--blue); font-weight: 600; }
+.hl-amber { color: var(--accent2); font-weight: 600; }
+
+.blist { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.blist:last-child { margin-bottom: 0; }
+.blist li {
+  font-size: 0.88rem;
+  color: var(--text2);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.6;
+}
+.blist li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--border2);
+  font-size: 0.75rem;
+  top: 3px;
+}
+
+.tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+.tbl-wrap:last-child { margin-bottom: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+th {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  background: var(--surface2);
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  line-height: 1.5;
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+.note-box {
+  background: var(--accent2-light);
+  border-left: 3px solid #d4a866;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.note-box .note-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent2);
+  margin-bottom: 4px;
+}
+
+.green-box {
+  background: var(--accent-light);
+  border-left: 3px solid #7ab892;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.green-box .note-label { color: var(--accent); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.blue-box {
+  background: var(--blue-light);
+  border-left: 3px solid #7aaad6;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.blue-box .note-label { color: var(--blue); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+.summary-cell {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.summary-cell .sc-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.summary-cell .sc-val {
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Software Engineering — Study Notes</h1>
+    <div class="header-meta">
+      <span>Chapter 14.4</span>
+      <span>Refactoring</span>
+      <span>Coursera</span>
+    </div>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('timing', this)">When to Refactor</button>
+    <button class="tab-btn" onclick="switchTab('extract', this)">Extract Method</button>
+  </nav>
+
+  <!-- Tab 1: Overview -->
+  <div id="tab-overview" class="tab-panel active">
+
+    <div class="card">
+      <div class="card-label">Core Concept</div>
+      <div class="card-title">What is Refactoring?</div>
+      <div class="keywords">
+        <span class="kw green">Refactoring</span>
+        <span class="kw">Internal Structure</span>
+        <span class="kw">External Behavior</span>
+        <span class="kw">Code Quality</span>
+      </div>
+      <div class="card-body">
+        Refactoring is the process of <span class="hl">changing the internal structure</span> of a program <span class="hl-green">without changing its external behavior</span>. The observable functionality remains identical — only the code's organization, readability, or design improves.
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Aspect</th><th>Refactoring</th><th>NOT Refactoring</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>External behavior</td><td>Unchanged</td><td>Modified / new features added</td></tr>
+            <tr><td>Internal structure</td><td>Improved</td><td>Untouched</td></tr>
+            <tr><td>Purpose</td><td>Improve code quality</td><td>Add features / fix bugs</td></tr>
+            <tr><td>Tests</td><td>Should still pass</td><td>New tests may be needed</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-box">
+        <div class="note-label">Exam Tip</div>
+        The key distinguisher: refactoring <strong>never alters external behavior</strong>. Options mentioning "adding new features" or "altering functionality" are always wrong answers for refactoring.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Common Misconceptions</div>
+      <div class="card-title">What Refactoring Is NOT</div>
+      <div class="keywords">
+        <span class="kw">Debugging</span>
+        <span class="kw">Optimization</span>
+        <span class="kw">Feature Addition</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Activity</th><th>Changes Behavior?</th><th>Is Refactoring?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Reorganize code structure</td>
+              <td>No</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes</td>
+            </tr>
+            <tr>
+              <td>Add a new feature</td>
+              <td>Yes</td>
+              <td style="color:var(--red); font-weight:600;">✗ No</td>
+            </tr>
+            <tr>
+              <td>Fix a bug</td>
+              <td>Yes (corrects behavior)</td>
+              <td style="color:var(--red); font-weight:600;">✗ No</td>
+            </tr>
+            <tr>
+              <td>Optimize performance (same output)</td>
+              <td>No</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes (if behavior unchanged)</td>
+            </tr>
+            <tr>
+              <td>Optimize but alter functionality</td>
+              <td>Yes</td>
+              <td style="color:var(--red); font-weight:600;">✗ No</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 2: When to Refactor -->
+  <div id="tab-timing" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Timing Rule</div>
+      <div class="card-title">Refactoring and Behavior Change: The Golden Rule</div>
+      <div class="keywords">
+        <span class="kw amber">Separation of Concerns</span>
+        <span class="kw">Behavior Change</span>
+        <span class="kw">Commit Discipline</span>
+      </div>
+      <div class="card-body">
+        <span class="hl-amber">Refactoring should NOT be done at the same time as changing behavior.</span> These are two separate activities and should be performed in separate steps (ideally separate commits).
+      </div>
+      <ul class="blist">
+        <li>Mixing refactoring with behavior change makes it hard to isolate bugs</li>
+        <li>If something breaks, you won't know if it was the refactor or the new logic</li>
+        <li>Best practice: refactor first (or after), then change behavior in a distinct step</li>
+        <li>Each step should be independently verifiable by running tests</li>
+      </ul>
+      <div class="tbl-wrap" style="margin-top:14px;">
+        <table>
+          <thead>
+            <tr><th>Statement</th><th>Verdict</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>"Refactoring should always be done after changing behavior"</td>
+              <td style="color:var(--red); font-weight:600;">FALSE</td>
+            </tr>
+            <tr>
+              <td>"Refactoring and behavior change should be kept separate"</td>
+              <td style="color:var(--accent); font-weight:600;">TRUE</td>
+            </tr>
+            <tr>
+              <td>"Refactoring can be done before or after a behavior change, but not simultaneously"</td>
+              <td style="color:var(--accent); font-weight:600;">TRUE</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="green-box">
+        <div class="note-label">One-Sentence Summary</div>
+        Refactoring is its own activity — never mix it with behavior changes; always keep them in separate steps.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 3: Extract Method -->
+  <div id="tab-extract" class="tab-panel">
+
+    <div class="card">
+      <div class="card-label">Refactoring Technique</div>
+      <div class="card-title">Extract Method</div>
+      <div class="keywords">
+        <span class="kw green">Extract Method</span>
+        <span class="kw blue">Reusability</span>
+        <span class="kw blue">Readability</span>
+        <span class="kw">Method Count</span>
+        <span class="kw">Single Responsibility</span>
+      </div>
+      <div class="card-body">
+        Extract Method takes a code fragment that can be grouped together and moves it into a new method with a name that explains its purpose. This is one of the most commonly used refactoring techniques.
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Benefit</th><th>Explanation</th><th>Real Benefit?</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Increases reusability</td>
+              <td>Extracted method can be called from multiple places</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes</td>
+            </tr>
+            <tr>
+              <td>Increases readability</td>
+              <td>Code reads like well-named function calls instead of inline logic</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes</td>
+            </tr>
+            <tr>
+              <td>Makes purpose clearer</td>
+              <td>A good method name documents the intent of the code</td>
+              <td style="color:var(--accent); font-weight:600;">✓ Yes</td>
+            </tr>
+            <tr>
+              <td>Decreases number of methods</td>
+              <td>Extraction <em>adds</em> a new method — method count increases, not decreases</td>
+              <td style="color:var(--red); font-weight:600;">✗ No — this is the trap!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="blist">
+        <li>Each extraction creates <strong>one new method</strong> — overall method count goes <strong>up</strong>, not down</li>
+        <li>The tradeoff is worth it: more methods, but each is shorter, named, and focused</li>
+        <li>Supports the <strong>Single Responsibility Principle</strong> — each method does one thing</li>
+        <li>Easier to unit-test smaller, extracted methods independently</li>
+      </ul>
+
+      <div class="note-box">
+        <div class="note-label">Exam Tip</div>
+        "Decreases the number of methods in a class" is the trick answer — Extract Method always <strong>increases</strong> method count. All other options (reusability, readability, understandability) are genuine benefits.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Example</div>
+      <div class="card-title">Before vs. After Extract Method</div>
+      <div class="card-body">
+        A practical illustration of how Extract Method transforms code structure:
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Before</th><th>After Extract Method</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-family:'Source Code Pro',monospace; font-size:0.8rem; white-space:pre-wrap; font-weight:400;">void printOrder() {
+  // print header
+  System.out.println("----");
+  System.out.println("Order");
+  System.out.println("----");
+  // print items
+  for (Item i : items)
+    System.out.println(i);
+}</td>
+              <td style="font-family:'Source Code Pro',monospace; font-size:0.8rem; white-space:pre-wrap; font-weight:400;">void printOrder() {
+  printHeader();
+  printItems();
+}
+
+void printHeader() {
+  System.out.println("----");
+  System.out.println("Order");
+  System.out.println("----");
+}
+
+void printItems() {
+  for (Item i : items)
+    System.out.println(i);
+}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="blue-box">
+        <div class="note-label">Key Observation</div>
+        External behavior (what gets printed) is <strong>identical</strong>. Internal structure is clearer. Method count went from 1 → 3. This is the essence of Extract Method refactoring.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

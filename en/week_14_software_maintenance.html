@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Chapter 14 · Software Maintenance &amp; Quiz</title>
+<link href="../css/study-sidebar.css" rel="stylesheet"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#faf9f7;--surface:#ffffff;--surface2:#f4f3f0;
+  --border:#e8e6e1;--text:#1c1b18;--text2:#4a4840;--muted:#8a8780;
+  --accent:#3d6b4f;--accent-light:#edf4ef;
+  --accent2:#7c5c2e;--accent2-light:#fdf4e7;
+  --blue:#2d5fa6;--blue-light:#ebf1fb;
+  --red:#a63d2d;--red-light:#fdf0ef;
+  --tag-bg:#f0ede8;--radius:8px;
+  --correct-bg:#dcfce7;--correct-text:#14532d;
+  --wrong-bg:#fee2e2;--wrong-text:#7f1d1d;
+  --reveal-bg:#dbeafe;--reveal-text:#1e3a8a;
+}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);padding:0;min-height:100vh;}
+.page-split{display:grid;grid-template-columns:minmax(0,var(--notes-pane-fr,1.15fr)) minmax(0,var(--quiz-pane-fr,0.85fr));min-height:100vh;max-width:1600px;width:100%;margin:0;}
+.pane{min-width:0;overflow-y:auto;max-height:100vh;padding:28px 22px 56px;}
+.notes-pane,.quiz-pane{background:var(--bg);border:none;}
+.notes-pane .container{max-width:none;margin:0;width:100%;}
+@media (max-width:960px){.page-split{grid-template-columns:1fr;}.pane{max-height:none;}}
+header{margin-bottom:24px;}
+header h1{font-family:'Lora',serif;font-size:1.55rem;font-weight:600;color:var(--text);letter-spacing:-0.01em;line-height:1.3;}
+.tab-nav{display:flex;flex-wrap:wrap;column-gap:2px;row-gap:6px;border:none;margin-bottom:24px;padding-bottom:0;overflow:visible;}
+.tab-nav::-webkit-scrollbar{display:none;}
+.tab-btn{font-family:'Source Sans 3',sans-serif;font-size:0.83rem;font-weight:500;padding:9px 16px;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color 0.15s,border-color 0.15s;}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--text);}
+.tab-btn:hover:not(.active){color:var(--text2);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;animation:fadeIn 0.2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.card{background:var(--surface);border:none;border-radius:var(--radius);padding:24px 26px;margin-bottom:16px;}
+.card-title{font-family:'Lora',serif;font-size:1.05rem;font-weight:600;color:var(--text);margin-bottom:14px;line-height:1.35;}
+.keywords{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.kw{font-family:'Source Code Pro',monospace;font-size:0.76rem;font-weight:500;background:var(--tag-bg);border:none;border-radius:4px;padding:3px 9px;color:var(--text2);}
+.kw.green{background:var(--accent-light);color:var(--accent);}
+.kw.blue{background:var(--blue-light);color:var(--blue);}
+.kw.amber{background:var(--accent2-light);color:var(--accent2);}
+.kw.red{background:var(--red-light);color:var(--red);}
+.card-body{font-size:0.9rem;color:var(--text2);line-height:1.65;margin-bottom:14px;}
+.hl{color:var(--text);font-weight:600;}
+.blist{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.blist li{font-size:0.88rem;color:var(--text2);padding-left:16px;position:relative;line-height:1.6;}
+.blist li::before{content:'—';position:absolute;left:0;color:var(--border);font-size:0.75rem;top:3px;}
+.tbl-wrap{overflow-x:auto;margin-bottom:14px;}
+table{width:100%;border-collapse:collapse;font-size:0.86rem;}
+th{font-family:'Source Code Pro',monospace;font-size:0.72rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);padding:8px 12px;border:none;text-align:left;background:var(--surface2);}
+td{padding:9px 12px;border:none;color:var(--text2);line-height:1.5;vertical-align:top;background:#fff;}
+td:first-child{font-weight:600;color:var(--text);white-space:nowrap;}
+.note-box,.green-box,.blue-box{border:none;border-radius:var(--radius);padding:12px 14px;font-size:0.86rem;color:var(--text2);line-height:1.6;margin-top:14px;}
+.note-box{background:var(--accent2-light);}
+.green-box{background:var(--accent-light);}
+.blue-box{background:var(--blue-light);}
+.note-label{font-family:'Source Code Pro',monospace;font-size:0.7rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+.note-box .note-label{color:var(--accent2);}
+.green-box .note-label{color:var(--accent);}
+.blue-box .note-label{color:var(--blue);}
+.red-box{border:none;border-radius:var(--radius);padding:12px 14px;font-size:0.86rem;color:var(--text2);line-height:1.6;margin-top:14px;background:var(--red-light);}
+.red-box .note-label{font-family:'Source Code Pro',monospace;font-size:0.7rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--red);margin-bottom:4px;}
+code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--tag-bg);padding:1px 6px;border-radius:3px;color:var(--text);}
+.embed-wrap{background:var(--surface);border:none;border-radius:var(--radius);padding:10px;margin-bottom:16px;}
+.note-embed{width:100%;height:72vh;border:none;border-radius:6px;background:var(--surface);}
+.qz-wrap{position:relative;font-family:'Source Sans 3',sans-serif;}
+.qz-header{margin-bottom:18px;padding-right:280px;}
+.qz-header h2{font-family:'Lora',serif;font-size:1.35rem;font-weight:600;color:var(--text);letter-spacing:-0.01em;line-height:1.3;margin:0;}
+.qz-tabs{display:flex;align-items:center;gap:2px;border:none;margin-bottom:24px;padding-bottom:4px;overflow-x:auto;scrollbar-width:none;}
+.qz-tab-btn{font-family:'Source Sans 3',sans-serif;font-size:0.83rem;font-weight:500;padding:9px 16px;border:none;background:none;color:var(--muted);cursor:default;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;}
+.qz-tab-btn.active{color:var(--text);border-bottom-color:var(--text);}
+.quiz-pane .qz-tab-nav{display:flex;gap:2px;border:none;margin-bottom:24px;padding-bottom:4px;overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;}
+.quiz-pane .qz-tab-nav::-webkit-scrollbar{display:none;}
+.quiz-pane .qz-tab-btn{font-family:'Source Sans 3',sans-serif;font-size:0.83rem;font-weight:500;padding:9px 14px;border:none;background:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color 0.15s,border-color 0.15s;}
+.quiz-pane .qz-tab-btn.active{color:var(--text);border-bottom-color:var(--text);}
+.quiz-pane .qz-tab-btn:hover:not(.active){color:var(--text2);}
+.qz-tab-panel{display:none;}
+.qz-tab-panel.active{display:block;animation:fadeIn 0.2s ease;}
+.qz-panel-toolbar{position:absolute;top:0;right:0;display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;}
+.qz-actions{margin-left:0;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.qz-reset{font-family:'Source Code Pro',monospace;font-size:0.76rem;font-weight:500;padding:6px 12px;border:none;background:var(--surface2);color:var(--text2);border-radius:4px;cursor:pointer;}
+.qz-reset:hover{color:var(--text);background:var(--tag-bg);}
+.score-bar{font-family:'Source Code Pro',monospace;font-size:0.76rem;color:var(--muted);margin:0;display:flex;align-items:center;gap:8px;}
+.score-pill{background:var(--surface2);border:none;border-radius:20px;padding:3px 10px;font-weight:500;color:var(--text);}
+.q-card{background:var(--surface);border:none;border-radius:var(--radius);padding:24px 26px;margin-bottom:16px;}
+.q-num{font-family:'Source Code Pro',monospace;font-size:0.7rem;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px;}
+.q-text{font-family:'Source Sans 3',sans-serif;font-size:0.9rem;font-weight:600;color:var(--text);line-height:1.65;margin-bottom:14px;}
+.q-code{margin:0 0 14px 0;padding:12px 14px;background:var(--surface2);border:none;border-radius:6px;overflow:auto;}
+.q-code code{display:block;font-family:'Source Code Pro',monospace;font-size:0.8rem;line-height:1.55;background:none;padding:0;white-space:pre;}
+.qz-options{display:flex;flex-direction:column;gap:6px;}
+.qz-opt{font-family:'Source Sans 3',sans-serif;font-size:0.88rem;padding:9px 13px;border:none;border-radius:4px;background:var(--surface2);color:var(--text);cursor:pointer;text-align:left;line-height:1.45;}
+.qz-opt:hover:not([disabled]){background:var(--accent-light);color:var(--accent);}
+.qz-opt[disabled]{cursor:default;}
+.qz-opt-correct,.qz-opt-wrong,.qz-opt-reveal,.qz-opt-neutral{font-family:'Source Sans 3',sans-serif;font-size:0.88rem;padding:9px 13px;border-radius:4px;text-align:left;line-height:1.45;cursor:default;border:none;}
+.qz-opt-correct{background:var(--correct-bg)!important;color:var(--correct-text)!important;font-weight:600;}
+.qz-opt-wrong{background:var(--wrong-bg)!important;color:var(--wrong-text)!important;}
+.qz-opt-reveal{background:var(--reveal-bg)!important;color:var(--reveal-text)!important;}
+.qz-opt-neutral{background:var(--surface2);color:var(--muted);}
+.qz-explanation{display:none;margin-top:14px;background:var(--blue-light);border:none;border-radius:var(--radius);padding:12px 14px;font-size:0.86rem;color:var(--text2);line-height:1.6;}
+.qz-expl-title{font-family:'Source Code Pro',monospace;font-weight:500;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue);margin-bottom:8px;}
+.qz-expl-plain{font-size:0.86rem;line-height:1.55;}
+.q-code.code-light{background:#ffffff;border:none;}
+.ck{color:#0033b3;font-weight:600;}
+.cs{color:#a31515;}
+.cc{color:#6a9955;font-style:italic;}
+.ct{color:#267f99;}
+.cm{color:#795e26;}
+@media (max-width:960px){
+  .qz-header{padding-right:0;}
+  .qz-panel-toolbar{position:static;margin-bottom:14px;}
+}
+</style>
+<link href="../css/study-week-tabs.css" rel="stylesheet"/>
+<script src="../js/study-week-common.js"></script>
+</head>
+<body data-study-week="week-14">
+<div class="app-shell">
+<div id="study-sidebar-root"></div>
+<div class="page-split">
+<div class="notes-pane pane">
+<div class="container">
+<header>
+<h1>Chapter 14 — Software Maintenance</h1>
+</header>
+<nav class="tab-nav">
+<button class="tab-btn active" onclick="switchTab('summary',this)" type="button">Summary</button>
+<button class="tab-btn" onclick="switchTab('14-3-metrics',this)" type="button">14.3 OO Metrics</button>
+<button class="tab-btn" onclick="switchTab('14-4-refactoring',this)" type="button">14.4 Refactoring</button>
+<button class="tab-btn" onclick="switchTab('14-5-example-refactoring',this)" type="button">14.5 Example Refactoring</button>
+<button class="tab-btn" onclick="switchTab('14-6-code-smells',this)" type="button">14.6 Code Smells</button>
+</nav>
+<div class="tab-panel" id="tab-14-3-metrics">
+<div class="card">
+<div class="card-title">14.3 Learning Objectives</div>
+<div class="keywords"><span class="kw green">WMC</span><span class="kw blue">DIT</span><span class="kw amber">CBO</span><span class="kw">NOC</span></div>
+<ul class="blist">
+<li>Understand what each OO metric (<strong>WMC, DIT, CBO, NOC</strong>) measures.</li>
+<li>Explain how high vs. low values of each metric affect <strong>complexity, testability, and reusability</strong>.</li>
+<li>Identify which metric is described given a definition or consequence.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">OO Metrics — Overview</div>
+<div class="keywords"><span class="kw green">WMC</span><span class="kw blue">DIT</span><span class="kw amber">CBO</span><span class="kw">NOC</span><span class="kw">CK Suite</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Metric</th><th>Full Name</th><th>What it Measures</th></tr></thead>
+<tbody>
+<tr><td>WMC</td><td>Weighted Methods Per Class</td><td>Sum of complexities of all methods in a class</td></tr>
+<tr><td>DIT</td><td>Depth of Inheritance Tree</td><td>How deep a class is in the inheritance hierarchy</td></tr>
+<tr><td>CBO</td><td>Coupling Between Object Classes</td><td>Number of other classes a class is coupled to</td></tr>
+<tr><td>NOC</td><td>Number of Children</td><td>Number of direct (immediate) subclasses</td></tr>
+</tbody>
+</table>
+</div>
+<div class="blue-box"><div class="note-label">Core Principle</div><ul class="blist" style="margin-top:6px;">
+<li><strong>Lower is better</strong> for WMC, DIT, and CBO — simpler, less coupled, more testable</li>
+<li><strong>NOC</strong> is more nuanced — high NOC means wider reuse but requires more careful design</li>
+<li>All four belong to the <strong>Chidamber &amp; Kemerer (CK) Metrics Suite</strong></li>
+</ul></div>
+</div>
+<div class="card">
+<div class="card-title">WMC — Weighted Methods Per Class</div>
+<div class="keywords"><span class="kw green">WMC</span><span class="kw">Method Complexity</span><span class="kw">Cyclomatic Complexity</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Aspect</th><th>Detail</th></tr></thead>
+<tbody>
+<tr><td>Formula</td><td>WMC = Σ complexity(method_i) for all methods in class</td></tr>
+<tr><td>Uniform weight</td><td>If each method has weight 1, WMC = total number of methods</td></tr>
+<tr><td>High WMC</td><td>Harder to understand, test, maintain, and reuse the class</td></tr>
+<tr><td>Low WMC</td><td>Simpler class; more likely to be reusable and testable</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam Point</div>WMC is the metric that measures the <strong>sum of complexities of methods in a class</strong> — not DIT, CBO, or NOC.</div>
+</div>
+<div class="card">
+<div class="card-title">DIT — Depth of Inheritance Tree</div>
+<div class="keywords"><span class="kw blue">DIT</span><span class="kw">Inheritance</span><span class="kw">Reuse</span><span class="kw">Predictability</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>DIT Value</th><th>Implication</th></tr></thead>
+<tbody>
+<tr><td>Low DIT</td><td>Fewer inherited methods; behavior is easier to predict and understand</td></tr>
+<tr><td>High DIT</td><td>More inherited methods → more reuse, but <strong>harder to predict behavior</strong> and more complex</td></tr>
+</tbody>
+</table>
+</div>
+<ul class="blist">
+<li>DIT applies to <strong>both single and multiple inheritance</strong> hierarchies</li>
+<li><strong>Reuse ↑</strong> as DIT increases; <strong>Predictability ↓</strong> as DIT increases</li>
+</ul>
+<div class="red-box"><div class="note-label">Common Misconception</div>Higher DIT does <strong>NOT</strong> make behavior easier to predict — more inherited methods = harder-to-predict behavior.</div>
+<div class="note-box"><div class="note-label">Exam Point</div>Higher DIT → <strong>more reuse but harder to predict + more complex</strong>.</div>
+</div>
+<div class="card">
+<div class="card-title">CBO — Coupling Between Object Classes</div>
+<div class="keywords"><span class="kw amber">CBO</span><span class="kw">Coupling</span><span class="kw">Testability</span><span class="kw">Reusability</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>CBO Level</th><th>Effect on Testability</th><th>Effect on Reusability</th></tr></thead>
+<tbody>
+<tr><td>Low CBO</td><td>Easier to test</td><td>More reusable</td></tr>
+<tr><td>High CBO</td><td>Harder to test</td><td>Less reusable</td></tr>
+</tbody>
+</table>
+</div>
+<ul class="blist">
+<li>High CBO means many dependencies → changes elsewhere can break this class</li>
+<li>Goal: <strong>low coupling, high cohesion</strong> — fundamental OO design principle</li>
+</ul>
+<div class="red-box"><div class="note-label">Exam Point — False Statement Alert</div>"Higher CBO makes a class easier to test and more reusable" is <strong>FALSE</strong>. Higher CBO does the opposite.</div>
+</div>
+<div class="card">
+<div class="card-title">NOC — Number of Children</div>
+<div class="keywords"><span class="kw">NOC</span><span class="kw">Subclasses</span><span class="kw">Inheritance Fan-out</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>NOC Level</th><th>Implication</th></tr></thead>
+<tbody>
+<tr><td>High NOC</td><td>Class is widely reused via inheritance; changes impact many subclasses — more testing needed</td></tr>
+<tr><td>Low NOC</td><td>Limited reuse through inheritance; less ripple effect from changes</td></tr>
+</tbody>
+</table>
+</div>
+<div class="blue-box"><div class="note-label">DIT vs. NOC</div><strong>DIT</strong> = how deep a class is (ancestors above). <strong>NOC</strong> = how wide its influence is (children below). Both are in the CK metrics suite.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-14-4-refactoring">
+<div class="card">
+<div class="card-title">14.4 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Refactoring</span><span class="kw blue">Extract Method</span><span class="kw amber">When to Refactor</span></div>
+<ul class="blist">
+<li>Explain what refactoring is and what it is <strong>not</strong>.</li>
+<li>Identify whether a given activity qualifies as refactoring.</li>
+<li>Explain when refactoring should (and should not) be combined with behavior changes.</li>
+<li>Describe the benefits and one trap of the <strong>Extract Method</strong> refactoring technique.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">What is Refactoring?</div>
+<div class="keywords"><span class="kw green">Refactoring</span><span class="kw">Internal Structure</span><span class="kw">External Behavior</span><span class="kw">Code Quality</span></div>
+<div class="card-body">Refactoring is the process of <strong>changing the internal structure</strong> of a program <strong>without changing its external behavior</strong>. The observable functionality remains identical — only the code's organization, readability, or design improves.</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Aspect</th><th>Refactoring</th><th>NOT Refactoring</th></tr></thead>
+<tbody>
+<tr><td>External behavior</td><td>Unchanged</td><td>Modified / new features added</td></tr>
+<tr><td>Internal structure</td><td>Improved</td><td>Untouched</td></tr>
+<tr><td>Purpose</td><td>Improve code quality</td><td>Add features / fix bugs</td></tr>
+<tr><td>Tests</td><td>Should still pass</td><td>New tests may be needed</td></tr>
+</tbody>
+</table>
+</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Activity</th><th>Changes Behavior?</th><th>Is Refactoring?</th></tr></thead>
+<tbody>
+<tr><td>Reorganize code structure</td><td>No</td><td>Yes</td></tr>
+<tr><td>Add a new feature</td><td>Yes</td><td>No</td></tr>
+<tr><td>Fix a bug</td><td>Yes (corrects behavior)</td><td>No</td></tr>
+<tr><td>Optimize performance (same output)</td><td>No</td><td>Yes (if behavior unchanged)</td></tr>
+<tr><td>Optimize but alter functionality</td><td>Yes</td><td>No</td></tr>
+</tbody>
+</table>
+</div>
+<div class="note-box"><div class="note-label">Exam Tip</div>The key distinguisher: refactoring <strong>never alters external behavior</strong>. Options mentioning "adding new features" or "altering functionality" are always wrong answers for refactoring.</div>
+</div>
+<div class="card">
+<div class="card-title">When to Refactor — The Golden Rule</div>
+<div class="keywords"><span class="kw amber">Separation of Concerns</span><span class="kw">Behavior Change</span><span class="kw">Commit Discipline</span></div>
+<div class="card-body"><strong>Refactoring should NOT be done at the same time as changing behavior.</strong> These are two separate activities and should be performed in separate steps (ideally separate commits).</div>
+<ul class="blist">
+<li>Mixing refactoring with behavior change makes it hard to isolate bugs</li>
+<li>If something breaks, you won't know if it was the refactor or the new logic</li>
+<li>Best practice: refactor first (or after), then change behavior in a distinct step</li>
+<li>Each step should be independently verifiable by running tests</li>
+</ul>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Statement</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>"Refactoring should always be done after changing behavior"</td><td>FALSE</td></tr>
+<tr><td>"Refactoring and behavior change should be kept separate"</td><td>TRUE</td></tr>
+<tr><td>"Refactoring can be done before or after, but not simultaneously"</td><td>TRUE</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">One-Sentence Summary</div>Refactoring is its own activity — never mix it with behavior changes; always keep them in separate steps.</div>
+</div>
+<div class="card">
+<div class="card-title">Extract Method</div>
+<div class="keywords"><span class="kw green">Extract Method</span><span class="kw blue">Reusability</span><span class="kw blue">Readability</span><span class="kw">Method Count ↑</span><span class="kw">Single Responsibility</span></div>
+<div class="card-body">Extract Method takes a code fragment that can be grouped together and moves it into a new method with a name that explains its purpose.</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Benefit</th><th>Explanation</th><th>Real Benefit?</th></tr></thead>
+<tbody>
+<tr><td>Increases reusability</td><td>Extracted method can be called from multiple places</td><td>Yes</td></tr>
+<tr><td>Increases readability</td><td>Code reads like well-named function calls instead of inline logic</td><td>Yes</td></tr>
+<tr><td>Makes purpose clearer</td><td>A good method name documents the intent of the code</td><td>Yes</td></tr>
+<tr><td>Decreases number of methods</td><td>Extraction <em>adds</em> a new method — count increases, not decreases</td><td>No — this is the trap!</td></tr>
+</tbody>
+</table>
+</div>
+<ul class="blist">
+<li>Each extraction creates <strong>one new method</strong> — overall method count goes <strong>up</strong>, not down</li>
+<li>Supports the <strong>Single Responsibility Principle</strong> — each method does one thing</li>
+<li>Easier to unit-test smaller, extracted methods independently</li>
+</ul>
+<div class="note-box"><div class="note-label">Exam Tip</div>"Decreases the number of methods in a class" is the trap answer — Extract Method always <strong>increases</strong> method count. Reusability, readability, and understandability are all genuine benefits.</div>
+</div>
+<div class="card">
+<div class="card-title">Extract Method — Before &amp; After</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Before</th><th>After Extract Method</th></tr></thead>
+<tbody>
+<tr>
+<td style="font-weight:400;"><div class="q-code code-light"><code><span class="ck">void</span> <span class="cm">printOrder</span>() {
+  <span class="cc">// print header</span>
+  <span class="ct">System</span>.<span class="cm">out</span>.<span class="cm">println</span>(<span class="cs">"----"</span>);
+  <span class="ct">System</span>.<span class="cm">out</span>.<span class="cm">println</span>(<span class="cs">"Order"</span>);
+  <span class="ct">System</span>.<span class="cm">out</span>.<span class="cm">println</span>(<span class="cs">"----"</span>);
+  <span class="cc">// print items</span>
+  <span class="ck">for</span> (<span class="ct">Item</span> i : items)
+    <span class="ct">System</span>.<span class="cm">out</span>.<span class="cm">println</span>(i);
+}</code></div></td>
+<td><div class="q-code code-light"><code><span class="ck">void</span> <span class="cm">printOrder</span>() {
+  <span class="cm">printHeader</span>();
+  <span class="cm">printItems</span>();
+}
+<span class="ck">void</span> <span class="cm">printHeader</span>() {
+  <span class="ct">System</span>.<span class="cm">out</span>.<span class="cm">println</span>(<span class="cs">"----"</span>);
+  <span class="ct">System</span>.<span class="cm">out</span>.<span class="cm">println</span>(<span class="cs">"Order"</span>);
+  <span class="ct">System</span>.<span class="cm">out</span>.<span class="cm">println</span>(<span class="cs">"----"</span>);
+}
+<span class="ck">void</span> <span class="cm">printItems</span>() {
+  <span class="ck">for</span> (<span class="ct">Item</span> i : items)
+    <span class="ct">System</span>.<span class="cm">out</span>.<span class="cm">println</span>(i);
+}</code></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="blue-box"><div class="note-label">Key Observation</div>External behavior (what gets printed) is <strong>identical</strong>. Internal structure is clearer. Method count went from 1 → 3. This is the essence of Extract Method refactoring.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-14-5-example-refactoring">
+<div class="card">
+<div class="card-title">14.5 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Introduce Parameter Object</span><span class="kw blue">Refactoring Steps</span><span class="kw amber">Extract Method</span><span class="kw">Benefits</span></div>
+<ul class="blist">
+<li>Identify the correct <strong>first step</strong> of Introduce Parameter Object refactoring.</li>
+<li>Apply the ordered process: create class, add parameter object, then remove old parameters incrementally.</li>
+<li>Explain why follow-up extraction into the new class improves cohesion and readability.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">Introduce Parameter Object — Example</div>
+<div class="keywords"><span class="kw green">Data Clumps</span><span class="kw blue">Parameter Object</span><span class="kw amber">Cohesion</span></div>
+<div class="card-body">When related parameters repeatedly appear together, create a dedicated object to represent them. This reduces long argument lists and makes intent explicit at call sites.</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Before</th><th>After</th></tr></thead>
+<tbody>
+<tr><td><code>book(startDate, endDate, startTime, endTime)</code></td><td><code>book(dateTimeRange)</code></td></tr>
+<tr><td><code>check(startDate, endDate, startTime, endTime)</code></td><td><code>check(dateTimeRange)</code></td></tr>
+<tr><td>Data clumps and order mistakes are common.</td><td>Single named object improves clarity and maintainability.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam Tip</div>The first step is to <strong>make a new class</strong> for the parameter group before adding it to signatures.</div>
+</div>
+<div class="card">
+<div class="card-title">Recommended Refactoring Sequence</div>
+<div class="keywords"><span class="kw blue">Order Matters</span><span class="kw">Incremental</span><span class="kw amber">Safety</span></div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Step</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Create the new parameter object class with fields/constructor.</td></tr>
+<tr><td>2</td><td>Add a new method parameter typed as that class.</td></tr>
+<tr><td>3</td><td>Update call sites to pass the new object.</td></tr>
+<tr><td>4</td><td>Remove original parameters one-by-one and replace usage with object fields.</td></tr>
+<tr><td>5</td><td>Move related logic into the new class when appropriate (Extract Method follow-up).</td></tr>
+</tbody>
+</table>
+</div>
+<div class="blue-box"><div class="note-label">Follow-up</div>After introducing the parameter object, check if behavior should move with data. This often improves object-oriented cohesion.</div>
+</div>
+<div class="card">
+<div class="card-title">Benefits and Common Trap</div>
+<div class="keywords"><span class="kw green">Readability</span><span class="kw green">Maintainability</span><span class="kw red">Trap Option</span></div>
+<ul class="blist">
+<li>Reduces parameters in method calls.</li>
+<li>Groups related values into one conceptually meaningful object.</li>
+<li>Improves readability and future maintenance.</li>
+</ul>
+<div class="red-box"><div class="note-label">Quiz Trap</div>“Makes code more difficult to understand” is <strong>not</strong> a benefit.</div>
+</div>
+</div>
+<div class="tab-panel" id="tab-14-6-code-smells">
+<div class="card">
+<div class="card-title">14.6 Learning Objectives</div>
+<div class="keywords"><span class="kw green">Code Smell</span><span class="kw blue">Maintainability</span><span class="kw amber">Duplicated Code</span><span class="kw red">Long Method</span></div>
+<ul class="blist">
+<li>Identify what a code smell indicates about software design quality.</li>
+<li>Connect common smells to practical maintenance risks in real codebases.</li>
+<li>Select suitable refactorings to improve readability and long-term changeability.</li>
+</ul>
+</div>
+<div class="card">
+<div class="card-title">What Is a Code Smell?</div>
+<div class="keywords"><span class="kw">Design Decay</span><span class="kw blue">Warning Sign</span><span class="kw">Not Always a Bug</span></div>
+<div class="card-body">A code smell is a <strong>warning sign</strong> that the code's internal structure is becoming harder to evolve. It does not always break behavior immediately, but it raises the risk and cost of future changes.</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Option</th><th>Is it a code smell?</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Design starts to decay</td><td>Yes</td><td>Smells point to maintainability and design quality issues.</td></tr>
+<tr><td>Syntax error</td><td>No</td><td>Syntax errors are immediate compile-time defects, not smells.</td></tr>
+<tr><td>Optimized code</td><td>No</td><td>Optimization is not itself a warning sign.</td></tr>
+<tr><td>Security vulnerability</td><td>No (different category)</td><td>Security issues are vulnerabilities, not smell classification.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="green-box"><div class="note-label">Exam Tip</div>The best definition is: <strong>a clear sign that code design is starting to decay</strong>.</div>
+</div>
+<div class="card">
+<div class="card-title">Duplicated Code and Refactoring</div>
+<div class="keywords"><span class="kw amber">Duplicated Code</span><span class="kw green">Extract Method</span><span class="kw">Single Source of Truth</span></div>
+<div class="card-body">When similar logic appears in multiple places, maintenance becomes error-prone. The most common first fix is <strong>Extract Method</strong>: move the repeated fragment into one named method and call it from each location.</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>Refactoring</th><th>Best for duplicated code?</th><th>Reason</th></tr></thead>
+<tbody>
+<tr><td>Extract Method</td><td>Yes</td><td>Consolidates repeated logic into one reusable implementation.</td></tr>
+<tr><td>Introduce Parameter Object</td><td>Sometimes</td><td>Solves long parameter lists / data clumps, not primary duplication cleanup.</td></tr>
+<tr><td>Inline Method</td><td>Usually no</td><td>Can increase duplication by spreading logic back into callers.</td></tr>
+<tr><td>Rename Variable</td><td>No</td><td>Improves naming only; does not remove duplicated logic.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="card-title">Long Method Smell</div>
+<div class="keywords"><span class="kw red">Long Method</span><span class="kw">Complexity</span><span class="kw blue">Readability</span></div>
+<ul class="blist">
+<li>Long methods mix too many responsibilities and hide intent.</li>
+<li>They increase cognitive load and slow down bug localization.</li>
+<li>They are harder to unit test because setup and branching become tangled.</li>
+<li>Refactor by extracting cohesive chunks with names that express purpose.</li>
+</ul>
+<div class="blue-box"><div class="note-label">True/False Focus</div>The statement is <strong>True</strong>: a Long Method smell is problematic because complexity makes code harder to understand and maintain.</div>
+</div>
+<div class="card">
+<div class="card-title">Quick Review</div>
+<ul class="blist">
+<li>Code smell = design quality warning, not necessarily immediate failure.</li>
+<li>Duplicated Code is commonly addressed with <strong>Extract Method</strong>.</li>
+<li>Long Method is a maintainability risk and should be decomposed.</li>
+</ul>
+</div>
+</div>
+<div class="tab-panel active" id="tab-summary">
+<div class="card">
+<div class="card-title">Chapter 14 Study Tabs</div>
+<div class="card-body">Use the tabs above to switch among <strong>14.3 Object-Oriented Metrics</strong>, <strong>14.4 Refactoring</strong>, <strong>14.5 Example Refactoring</strong>, and <strong>14.6 Code Smells</strong>. The right-side quiz pane automatically follows the selected note tab (Week 11 style behavior).</div>
+</div>
+<div class="card">
+<div class="card-title">Included in Week 14</div>
+<ul class="blist">
+<li><strong>14.3 Notes + Quiz</strong> moved into this page.</li>
+<li><strong>14.4 Notes + Quiz</strong> moved into this page.</li>
+<li><strong>14.5 Notes + Quiz</strong> moved into this page.</li>
+<li><strong>14.6 Notes + Quiz</strong> moved into this page.</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="quiz-pane pane">
+<div class="qz-wrap">
+<div class="qz-header">
+<h2>Chapter 14 — quiz</h2>
+</div>
+<div class="qz-tab-panel" id="qz-panel-14-3">
+<div class="qz-panel-toolbar">
+<div class="qz-actions">
+<button class="qz-reset" onclick="resetQuizCh14_14_3()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-ch14-14-3">— / 3</span></div>
+</div>
+</div>
+<div id="questions-ch14-14-3"></div>
+</div>
+<div class="qz-tab-panel" id="qz-panel-14-4">
+<div class="qz-panel-toolbar">
+<div class="qz-actions">
+<button class="qz-reset" onclick="resetQuizCh14_14_4()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-ch14-14-4">— / 3</span></div>
+</div>
+</div>
+<div id="questions-ch14-14-4"></div>
+</div>
+<div class="qz-tab-panel" id="qz-panel-14-5">
+<div class="qz-panel-toolbar">
+<div class="qz-actions">
+<button class="qz-reset" onclick="resetQuizCh14_14_5()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-ch14-14-5">— / 3</span></div>
+</div>
+</div>
+<div id="questions-ch14-14-5"></div>
+</div>
+<div class="qz-tab-panel" id="qz-panel-14-6">
+<div class="qz-panel-toolbar">
+<div class="qz-actions">
+<button class="qz-reset" onclick="resetQuizCh14_14_6()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-ch14-14-6">— / 3</span></div>
+</div>
+</div>
+<div id="questions-ch14-14-6"></div>
+</div>
+<div class="qz-tab-panel active" id="qz-panel-14-sum">
+<p style="padding:16px 4px;color:var(--muted);font-size:0.88rem;">No week 14 quiz in Coursera.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+var NOTE_TO_QUIZ = {
+  '14-3-metrics': '14-3',
+  '14-4-refactoring': '14-4',
+  '14-5-example-refactoring': '14-5',
+  '14-6-code-smells': '14-6',
+  'summary': '14-sum'
+};
+function switchTab(id, btn) {
+  if (!btn) return;
+  var pane = btn.closest('.notes-pane');
+  if (!pane) return;
+  pane.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  pane.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  var panel = document.getElementById('tab-' + id);
+  if (panel) panel.classList.add('active');
+  btn.classList.add('active');
+  document.querySelectorAll('.qz-tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  var qzId = NOTE_TO_QUIZ[id];
+  var qzPanel = qzId ? document.getElementById('qz-panel-' + qzId) : null;
+  if (!qzPanel) qzPanel = document.getElementById('qz-panel-14-sum');
+  if (qzPanel) qzPanel.classList.add('active');
+}
+</script>
+<script src="../js/quiz-pane.js"></script>
+<script>
+var CH14_RAW_QUESTIONS = [
+  { q: '[14.3] Which OO metric measures the sum of method complexities in a class?', opts: ['Depth of Inheritance Tree (DIT)', 'Weighted Methods Per Class (WMC)', 'Coupling between Object Classes (CBO)', 'Number of Children (NOC)'], ans: 1, exp: 'WMC sums method complexities for a class.' },
+  { q: '[14.3] True or False: Higher CBO makes a class easier to test and more reusable.', opts: ['True', 'False'], ans: 1, exp: 'Higher coupling generally reduces testability and reusability.' },
+  { q: '[14.3] Which statement about DIT is true?', opts: ['Higher DIT makes behavior easier to predict.', 'Higher DIT means more reuse but harder-to-predict behavior and higher complexity.', 'DIT only considers single inheritance and ignores multiple inheritance.', 'DIT is unrelated to class complexity.'], ans: 1, exp: 'Higher DIT can increase reuse but also increases complexity and predictability challenges.' },
+  { q: '[14.4] Which best describes refactoring?', opts: ['Changing external behavior to add new features.', 'Changing internal structure without changing external behavior.', 'Optimizing performance while altering functionality.', 'Debugging and fixing errors.'], ans: 1, exp: 'Refactoring preserves external behavior while improving internal design.' },
+  { q: '[14.4] True or False: Refactoring should always be done after changing program behavior.', opts: ['True', 'False'], ans: 1, exp: 'Refactoring and behavior changes should be separated; not necessarily always after.' },
+  { q: '[14.4] Which is NOT a benefit of Extract Method?', opts: ['Increases code reusability', 'Increases code readability', 'Decreases the number of methods in a class', 'Makes code purpose more understandable'], ans: 2, exp: 'Extract Method usually increases, not decreases, the number of methods.' },
+  { q: '[14.5] Which of the following is the first step when performing Introduce Parameter Object refactoring?', opts: ['Add a new parameter whose type is the new class', 'Make a new class for the group of parameters', 'Incrementally remove each original parameter', 'Replace method calls with inlined code'], ans: 1, exp: 'You must create the class before using it as a parameter type.' },
+  { q: '[14.5] After using Introduce Parameter Object, should you check if code can be moved to methods of the new class?', opts: ['True', 'False'], ans: 0, exp: 'Yes. Moving behavior with data is a common and beneficial follow-up.' },
+  { q: '[14.5] Which is NOT a benefit of using Introduce Parameter Object?', opts: ['Reduces the number of parameters in method calls', 'Makes the code more difficult to understand', 'Increases code readability and maintainability', 'Groups related parameters together into a single object'], ans: 1, exp: 'Introduce Parameter Object is intended to improve clarity, not reduce it.' },
+  { q: '[14.6] Which of the following best describes a code smell?', opts: ["A clear sign that the code's design is starting to decay", 'A syntax error that prevents code from compiling', 'An optimized piece of code that improves performance', 'A security vulnerability in the code'], ans: 0, exp: 'A code smell is a maintainability warning sign in code design, not necessarily a compile or security error.' },
+  { q: '[14.6] Which of the following refactorings is commonly used to resolve Duplicated Code?', opts: ['Extract Method', 'Introduce Parameter Object', 'Inline Method', 'Rename Variable'], ans: 0, exp: 'Extract Method removes duplication by pulling shared logic into one reusable method.' },
+  { q: '[14.6] True or False: A Long Method code smell is problematic because it can be difficult to understand and maintain due to its complexity.', opts: ['True', 'False'], ans: 0, exp: 'Long methods are harder to read, test, and change safely, so they are common refactoring targets.' }
+];
+
+function ch14Slice(start, end) {
+  return CH14_RAW_QUESTIONS.slice(start, end).map(function (rq, i) {
+    return {
+      num: i + 1,
+      text: rq.q.replace(/^\[[^\]]+\]\s*/, ''),
+      code: rq.code || '',
+      options: rq.opts,
+      correct: rq.ans,
+      exp: rq.exp
+    };
+  });
+}
+
+function ch14Mount(cfg) {
+  QuizPane.mount({
+    questions: cfg.questions,
+    expandExplanationToOptions: true,
+    containerId: cfg.containerId,
+    scoreId: cfg.scoreId,
+    idPrefix: cfg.idPrefix,
+    resetGlobalName: cfg.resetGlobalName,
+    noGlobalReset: true
+  });
+}
+
+ch14Mount({
+  questions: ch14Slice(0, 3),
+  containerId: 'questions-ch14-14-3',
+  scoreId: 'score-ch14-14-3',
+  idPrefix: 'ch14m14-3-',
+  resetGlobalName: 'resetQuizCh14_14_3'
+});
+ch14Mount({
+  questions: ch14Slice(3, 6),
+  containerId: 'questions-ch14-14-4',
+  scoreId: 'score-ch14-14-4',
+  idPrefix: 'ch14m14-4-',
+  resetGlobalName: 'resetQuizCh14_14_4'
+});
+ch14Mount({
+  questions: ch14Slice(6, 9),
+  containerId: 'questions-ch14-14-5',
+  scoreId: 'score-ch14-14-5',
+  idPrefix: 'ch14m14-5-',
+  resetGlobalName: 'resetQuizCh14_14_5'
+});
+ch14Mount({
+  questions: ch14Slice(9, 12),
+  containerId: 'questions-ch14-14-6',
+  scoreId: 'score-ch14-14-6',
+  idPrefix: 'ch14m14-6-',
+  resetGlobalName: 'resetQuizCh14_14_6'
+});
+</script>
+<script src="../js/study-weeks-config.js"></script>
+<script src="../js/study-lang.js"></script>
+<script src="../js/study-sidebar.js"></script>
+</body>
+</html>

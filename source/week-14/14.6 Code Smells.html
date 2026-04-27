@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14.6 Code Smells - Notes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:#faf9f7;--surface:#ffffff;--surface2:#f4f3f0;
+  --border:#e8e6e1;--text:#1c1b18;--text2:#4a4840;--muted:#8a8780;
+  --accent:#3d6b4f;--accent-light:#edf4ef;
+  --accent2:#7c5c2e;--accent2-light:#fdf4e7;
+  --blue:#2d5fa6;--blue-light:#ebf1fb;
+  --red:#a63d2d;--red-light:#fdf0ef;
+  --tag-bg:#f0ede8;--radius:8px;
+}
+body { font-family:'Source Sans 3',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; padding:36px 16px 60px; }
+.container { max-width:780px; margin:0 auto; }
+header { margin-bottom:28px; }
+header h1 { font-family:'Lora',serif; font-size:1.55rem; font-weight:600; color:var(--text); line-height:1.3; }
+.header-meta { margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; }
+.header-meta span { font-family:'Source Code Pro',monospace; font-size:0.74rem; color:var(--muted); background:var(--surface); padding:2px 8px; border-radius:4px; border:1px solid var(--border); }
+.card { background:var(--surface); border:none; border-radius:var(--radius); padding:24px 26px; margin-bottom:16px; }
+.card-title { font-family:'Lora',serif; font-size:1.05rem; font-weight:600; color:var(--text); margin-bottom:14px; line-height:1.35; }
+.keywords { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+.kw { font-family:'Source Code Pro',monospace; font-size:0.76rem; font-weight:500; background:var(--tag-bg); border:none; border-radius:4px; padding:3px 9px; color:var(--text2); }
+.kw.green{background:var(--accent-light);color:var(--accent);}
+.kw.blue{background:var(--blue-light);color:var(--blue);}
+.kw.amber{background:var(--accent2-light);color:var(--accent2);}
+.kw.red{background:var(--red-light);color:var(--red);}
+.card-body { font-size:0.9rem; color:var(--text2); line-height:1.65; margin-bottom:14px; }
+.blist { list-style:none; display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+.blist li { font-size:0.88rem; color:var(--text2); padding-left:16px; position:relative; line-height:1.6; }
+.blist li::before { content:'-'; position:absolute; left:0; color:var(--muted); }
+.tbl-wrap { overflow-x:auto; margin-bottom:14px; }
+table { width:100%; border-collapse:collapse; font-size:0.86rem; }
+th { font-family:'Source Code Pro',monospace; font-size:0.72rem; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); padding:8px 12px; text-align:left; background:var(--surface2); }
+td { padding:9px 12px; color:var(--text2); line-height:1.5; vertical-align:top; background:#fff; }
+td:first-child { font-weight:600; color:var(--text); white-space:nowrap; }
+.note-box,.green-box,.blue-box,.red-box { border:none; border-radius:var(--radius); padding:12px 14px; font-size:0.86rem; color:var(--text2); line-height:1.6; margin-top:14px; }
+.note-box{background:var(--accent2-light);} .green-box{background:var(--accent-light);} .blue-box{background:var(--blue-light);} .red-box{background:var(--red-light);}
+.note-label { font-family:'Source Code Pro',monospace; font-size:0.7rem; font-weight:500; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:4px; color:var(--muted); }
+code { font-family:'Source Code Pro',monospace; font-size:0.84em; background:var(--tag-bg); border-radius:3px; padding:1px 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Software Engineering - Study Notes</h1>
+    <div class="header-meta">
+      <span>Chapter 14.6</span>
+      <span>Code Smells</span>
+      <span>Coursera</span>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="card-title">14.6 Learning Objectives</div>
+    <div class="keywords"><span class="kw green">Code Smell</span><span class="kw blue">Maintainability</span><span class="kw amber">Duplicated Code</span><span class="kw red">Long Method</span></div>
+    <ul class="blist">
+      <li>Identify what a code smell indicates about software design quality.</li>
+      <li>Connect common smells to practical maintenance risks in real codebases.</li>
+      <li>Select suitable refactorings to improve readability and long-term changeability.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What Is a Code Smell?</div>
+    <div class="keywords"><span class="kw">Design Decay</span><span class="kw blue">Warning Sign</span><span class="kw">Not Always a Bug</span></div>
+    <div class="card-body">A code smell is a <strong>warning sign</strong> that the code's internal structure is becoming harder to evolve. It does not always break behavior immediately, but it raises the risk and cost of future changes.</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Option</th><th>Is it a code smell?</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Design starts to decay</td><td>Yes</td><td>Smells point to maintainability and design quality issues.</td></tr>
+          <tr><td>Syntax error</td><td>No</td><td>Syntax errors are immediate compile-time defects, not smells.</td></tr>
+          <tr><td>Optimized code</td><td>No</td><td>Optimization is not itself a warning sign.</td></tr>
+          <tr><td>Security vulnerability</td><td>No (different category)</td><td>Security issues are vulnerabilities, not smell classification.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="green-box"><div class="note-label">Exam Tip</div>The best definition is: <strong>a clear sign that code design is starting to decay</strong>.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Duplicated Code and Refactoring</div>
+    <div class="keywords"><span class="kw amber">Duplicated Code</span><span class="kw green">Extract Method</span><span class="kw">Single Source of Truth</span></div>
+    <div class="card-body">When similar logic appears in multiple places, maintenance becomes error-prone. The most common first fix is <strong>Extract Method</strong>: move the repeated fragment into one named method and call it from each location.</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Refactoring</th><th>Best for duplicated code?</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>Extract Method</td><td>Yes</td><td>Consolidates repeated logic into one reusable implementation.</td></tr>
+          <tr><td>Introduce Parameter Object</td><td>Sometimes</td><td>Solves long parameter lists/data clumps, not primary duplication cleanup.</td></tr>
+          <tr><td>Inline Method</td><td>Usually no</td><td>Can increase duplication by spreading logic back into callers.</td></tr>
+          <tr><td>Rename Variable</td><td>No</td><td>Improves naming only; does not remove duplicated logic.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Long Method Smell</div>
+    <div class="keywords"><span class="kw red">Long Method</span><span class="kw">Complexity</span><span class="kw blue">Readability</span></div>
+    <ul class="blist">
+      <li>Long methods mix too many responsibilities and hide intent.</li>
+      <li>They increase cognitive load and slow down bug localization.</li>
+      <li>They are harder to unit test because setup and branching become tangled.</li>
+      <li>Refactor by extracting cohesive chunks with names that express purpose.</li>
+    </ul>
+    <div class="blue-box"><div class="note-label">True/False Focus</div>The statement is <strong>True</strong>: a Long Method smell is problematic because complexity makes code harder to understand and maintain.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Quick Review</div>
+    <ul class="blist">
+      <li>Code smell = design quality warning, not necessarily immediate failure.</li>
+      <li>Duplicated Code is commonly addressed with <code>Extract Method</code>.</li>
+      <li>Long Method is a maintainability risk and should be decomposed.</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

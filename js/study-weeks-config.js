@@ -14,7 +14,11 @@ window.STUDY_WEEKS = [
   { id: 'week-9', num: 9, file: null, label: 'Spring Break' },
   { id: 'week-10', num: 10, file: null, label: 'Iteration 3', soon: true },
   { id: 'week-11', num: 11, file: 'week_11_debugging.html', label: 'Debugging' },
-  { id: 'week-12', num: 12, file: null, label: 'Iteration 4', soon: true }
+  { id: 'week-12', num: 12, file: null, label: 'Iteration 4', soon: true },
+  { id: 'week-13', num: 13, file: null, label: 'Exam 1', soon: true },
+  { id: 'week-14', num: 14, file: 'week_14_software_maintenance.html', label: 'Software Maintenance' },
+  { id: 'week-15', num: 15, file: null, label: 'Exam 2', soon: true },
+  { id: 'week-16', num: 16, file: null, label: 'Final Deliverable', soon: true }
 ];
 
 window.formatWeekLabel = function (w) {

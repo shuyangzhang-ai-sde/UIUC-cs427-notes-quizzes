@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>14.3 Object-Oriented Metrics — Notes</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #f4f3f0;
+  --border: #e8e6e1;
+  --border2: #d4d1ca;
+  --text: #1c1b18;
+  --text2: #4a4840;
+  --muted: #8a8780;
+  --accent: #3d6b4f;
+  --accent-light: #edf4ef;
+  --accent2: #7c5c2e;
+  --accent2-light: #fdf4e7;
+  --blue: #2d5fa6;
+  --blue-light: #ebf1fb;
+  --red-light: #fdf0ef;
+  --red: #a63d2d;
+  --tag-bg: #f0ede8;
+  --radius: 8px;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 36px 16px 60px;
+}
+
+.container { max-width: 780px; margin: 0 auto; }
+
+header { margin-bottom: 36px; }
+header h1 {
+  font-family: 'Lora', serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.header-meta {
+  margin-top: 6px;
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  color: var(--muted);
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-meta span {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.tab-nav {
+  display: flex;
+  gap: 2px;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 32px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 500;
+  padding: 9px 16px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn.active { color: var(--text); border-bottom-color: var(--text); }
+.tab-btn:hover:not(.active) { color: var(--text2); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  margin-bottom: 16px;
+}
+.card:hover { border-color: var(--border2); }
+
+.card-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-family: 'Lora', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.35;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.kw {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.76rem;
+  font-weight: 500;
+  background: var(--tag-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 9px;
+  color: var(--text2);
+}
+.kw.green { background: var(--accent-light); border-color: #b8d4c0; color: var(--accent); }
+.kw.blue { background: var(--blue-light); border-color: #b0c8e8; color: var(--blue); }
+.kw.amber { background: var(--accent2-light); border-color: #e0c898; color: var(--accent2); }
+.kw.red { background: var(--red-light); border-color: #e0b8b0; color: var(--red); }
+
+.card-body {
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.card-body:last-child { margin-bottom: 0; }
+
+.hl { color: var(--text); font-weight: 600; }
+.hl-green { color: var(--accent); font-weight: 600; }
+.hl-blue { color: var(--blue); font-weight: 600; }
+.hl-amber { color: var(--accent2); font-weight: 600; }
+.hl-red { color: var(--red); font-weight: 600; }
+
+.blist { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.blist:last-child { margin-bottom: 0; }
+.blist li {
+  font-size: 0.88rem;
+  color: var(--text2);
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.6;
+}
+.blist li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--border2);
+  font-size: 0.75rem;
+  top: 3px;
+}
+
+.tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+.tbl-wrap:last-child { margin-bottom: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+th {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  background: var(--surface2);
+}
+td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  line-height: 1.5;
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
+
+.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+.note-box {
+  background: var(--accent2-light);
+  border-left: 3px solid #d4a866;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.note-box .note-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent2);
+  margin-bottom: 4px;
+}
+
+.green-box {
+  background: var(--accent-light);
+  border-left: 3px solid #7ab892;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.green-box .note-label { color: var(--accent); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.blue-box {
+  background: var(--blue-light);
+  border-left: 3px solid #7aaad6;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.blue-box .note-label { color: var(--blue); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.red-box {
+  background: var(--red-light);
+  border-left: 3px solid #d4948a;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 12px 14px;
+  font-size: 0.86rem;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.red-box .note-label { color: var(--red); font-family: 'Source Code Pro', monospace; font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 4px;
+}
+.summary-cell {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+}
+.summary-cell .sc-label {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.summary-cell .sc-val {
+  font-size: 0.87rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.summary-cell .sc-sub {
+  font-size: 0.78rem;
+  color: var(--text2);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>14.3 — Object-Oriented Metrics</h1>
+    <div class="header-meta">
+      <span>Chapter 14</span>
+      <span>OO Metrics</span>
+      <span>Software Engineering</span>
+    </div>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('wmc', this)">WMC</button>
+    <button class="tab-btn" onclick="switchTab('dit', this)">DIT</button>
+    <button class="tab-btn" onclick="switchTab('cbo', this)">CBO</button>
+    <button class="tab-btn" onclick="switchTab('noc', this)">NOC</button>
+    <button class="tab-btn" onclick="switchTab('compare', this)">Comparison</button>
+  </nav>
+
+  <!-- Tab: Overview -->
+  <div id="tab-overview" class="tab-panel active">
+    <div class="card">
+      <div class="card-label">Introduction</div>
+      <div class="card-title">Object-Oriented (OO) Metrics</div>
+      <div class="keywords">
+        <span class="kw green">OO Metrics</span>
+        <span class="kw">Complexity</span>
+        <span class="kw">Maintainability</span>
+        <span class="kw">Testability</span>
+        <span class="kw">Reusability</span>
+      </div>
+      <div class="card-body">
+        OO Metrics are quantitative measures used to evaluate the structural properties of object-oriented software. They help assess <span class="hl">complexity</span>, <span class="hl">coupling</span>, and <span class="hl">inheritance depth</span> — all of which directly impact maintainability, testability, and reusability.
+      </div>
+      <div class="summary-grid">
+        <div class="summary-cell">
+          <div class="sc-label">WMC</div>
+          <div class="sc-val">Weighted Methods Per Class</div>
+          <div class="sc-sub">Sum of method complexities in a class</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label">DIT</div>
+          <div class="sc-val">Depth of Inheritance Tree</div>
+          <div class="sc-sub">How deep a class is in the hierarchy</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label">CBO</div>
+          <div class="sc-val">Coupling Between Object Classes</div>
+          <div class="sc-sub">How tightly classes depend on each other</div>
+        </div>
+        <div class="summary-cell">
+          <div class="sc-label">NOC</div>
+          <div class="sc-val">Number of Children</div>
+          <div class="sc-sub">Direct subclasses of a class</div>
+        </div>
+      </div>
+      <div class="blue-box">
+        <div class="note-label">Core Principle</div>
+        Generally, <strong>lower is better</strong> for WMC, DIT, and CBO — lower values indicate simpler, less coupled, more testable classes. NOC is more nuanced.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: WMC -->
+  <div id="tab-wmc" class="tab-panel">
+    <div class="card">
+      <div class="card-label">Metric</div>
+      <div class="card-title">WMC — Weighted Methods Per Class</div>
+      <div class="keywords">
+        <span class="kw green">WMC</span>
+        <span class="kw">Method Complexity</span>
+        <span class="kw">Cyclomatic Complexity</span>
+        <span class="kw">Class Size</span>
+      </div>
+      <div class="card-body">
+        WMC measures the <span class="hl-green">sum of complexities of all methods</span> defined in a class. If all methods are treated as equally complex (weight = 1), WMC simply equals the number of methods in the class.
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Aspect</th><th>Detail</th></tr></thead>
+          <tbody>
+            <tr><td>What it measures</td><td>Sum of individual method complexities (e.g., cyclomatic complexity) across all methods in a class</td></tr>
+            <tr><td>Formula</td><td>WMC = Σ complexity(method_i) for all methods in class</td></tr>
+            <tr><td>Uniform weight</td><td>If each method has weight 1, WMC = total number of methods</td></tr>
+            <tr><td>High WMC impact</td><td>Harder to understand, test, maintain, and reuse the class</td></tr>
+            <tr><td>Low WMC impact</td><td>Simpler class; more likely to be reusable and testable</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="blist">
+        <li>A class with many complex methods is harder to <strong>understand and test</strong></li>
+        <li>High WMC suggests the class may be doing too much — violating the <strong>Single Responsibility Principle</strong></li>
+        <li>WMC is one of the Chidamber & Kemerer (CK) metrics suite</li>
+      </ul>
+      <div class="note-box">
+        <div class="note-label">Exam Point</div>
+        WMC is the metric that measures the <strong>sum of complexities of methods in a class</strong> — not DIT, CBO, or NOC.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: DIT -->
+  <div id="tab-dit" class="tab-panel">
+    <div class="card">
+      <div class="card-label">Metric</div>
+      <div class="card-title">DIT — Depth of Inheritance Tree</div>
+      <div class="keywords">
+        <span class="kw blue">DIT</span>
+        <span class="kw">Inheritance</span>
+        <span class="kw">Class Hierarchy</span>
+        <span class="kw">Reuse</span>
+        <span class="kw">Predictability</span>
+      </div>
+      <div class="card-body">
+        DIT measures how deep a class is in the inheritance hierarchy — i.e., the <span class="hl-blue">maximum number of ancestor classes</span> from the class to the root.
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>DIT Value</th><th>Implication</th></tr></thead>
+          <tbody>
+            <tr><td>Low DIT</td><td>Fewer inherited methods; class behavior is easier to predict and understand</td></tr>
+            <tr><td>High DIT</td><td>More inherited methods → more reuse, but behavior is harder to predict and class is more complex</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="blist">
+        <li><strong>Reuse ↑</strong> as DIT increases — the class inherits more methods from ancestors</li>
+        <li><strong>Predictability ↓</strong> as DIT increases — harder to trace which inherited method is being called</li>
+        <li>DIT applies to <strong>both single and multiple inheritance</strong> hierarchies</li>
+        <li>DIT is related to class complexity — deeper hierarchies introduce more indirect dependencies</li>
+      </ul>
+      <div class="red-box">
+        <div class="note-label">Common Misconception</div>
+        Higher DIT does <strong>NOT</strong> make behavior easier to predict — it's the opposite. More inherited methods = more complexity and harder-to-predict behavior.
+      </div>
+      <div class="note-box">
+        <div class="note-label">Exam Point</div>
+        Higher DIT → <strong>more reuse but harder to predict + more complex</strong>. DIT is <strong>not</strong> limited to single inheritance.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: CBO -->
+  <div id="tab-cbo" class="tab-panel">
+    <div class="card">
+      <div class="card-label">Metric</div>
+      <div class="card-title">CBO — Coupling Between Object Classes</div>
+      <div class="keywords">
+        <span class="kw amber">CBO</span>
+        <span class="kw">Coupling</span>
+        <span class="kw">Dependencies</span>
+        <span class="kw">Testability</span>
+        <span class="kw">Reusability</span>
+      </div>
+      <div class="card-body">
+        CBO counts the number of <span class="hl-amber">other classes a class is coupled to</span> — i.e., how many distinct classes it depends on or that depend on it (excluding inheritance relationships).
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>CBO Level</th><th>Effect on Testability</th><th>Effect on Reusability</th></tr></thead>
+          <tbody>
+            <tr><td>Low CBO</td><td style="color:var(--accent); font-weight:600;">Easier to test</td><td style="color:var(--accent); font-weight:600;">More reusable</td></tr>
+            <tr><td>High CBO</td><td style="color:var(--red); font-weight:600;">Harder to test</td><td style="color:var(--red); font-weight:600;">Less reusable</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="blist">
+        <li>High CBO means the class depends on many others → changes elsewhere can break it</li>
+        <li>Tightly coupled classes require more <strong>setup and mocking</strong> during testing</li>
+        <li>A highly coupled class is <strong>harder to reuse</strong> in a different context — it carries many dependencies</li>
+        <li>Goal: <strong>low coupling, high cohesion</strong> is a fundamental OO design principle</li>
+      </ul>
+      <div class="red-box">
+        <div class="note-label">Exam Point — False Statement Alert</div>
+        "Higher CBO makes a class easier to test and more reusable" is <strong>FALSE</strong>. Higher CBO does the opposite: it makes testing harder and reuse more difficult.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: NOC -->
+  <div id="tab-noc" class="tab-panel">
+    <div class="card">
+      <div class="card-label">Metric</div>
+      <div class="card-title">NOC — Number of Children</div>
+      <div class="keywords">
+        <span class="kw">NOC</span>
+        <span class="kw">Subclasses</span>
+        <span class="kw">Inheritance</span>
+        <span class="kw">Influence</span>
+      </div>
+      <div class="card-body">
+        NOC counts the number of <span class="hl">immediate subclasses</span> (direct children) of a class in the class hierarchy.
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>NOC Level</th><th>Implication</th></tr></thead>
+          <tbody>
+            <tr><td>High NOC</td><td>Class is highly reused via inheritance; changes to it impact many subclasses — more testing needed</td></tr>
+            <tr><td>Low NOC</td><td>Limited reuse through inheritance; less ripple effect from changes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="blist">
+        <li>A high NOC class has <strong>greater influence</strong> over the system — it must be designed carefully</li>
+        <li>More children = more thorough testing required for the parent class</li>
+        <li>NOC indicates the <strong>breadth of reuse</strong> (whereas DIT indicates depth)</li>
+        <li>NOC does not directly measure complexity like WMC — it measures inheritance fan-out</li>
+      </ul>
+      <div class="blue-box">
+        <div class="note-label">DIT vs. NOC</div>
+        <strong>DIT</strong> = how deep a class is (ancestors above it). <strong>NOC</strong> = how wide its influence is (children below it). Both are part of the CK metrics suite.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Comparison -->
+  <div id="tab-compare" class="tab-panel">
+    <div class="card">
+      <div class="card-label">Summary</div>
+      <div class="card-title">All Four OO Metrics at a Glance</div>
+      <div class="keywords">
+        <span class="kw green">WMC</span>
+        <span class="kw blue">DIT</span>
+        <span class="kw amber">CBO</span>
+        <span class="kw">NOC</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Metric</th><th>Full Name</th><th>Measures</th><th>High Value Means</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>WMC</td>
+              <td>Weighted Methods Per Class</td>
+              <td>Sum of method complexities in a class</td>
+              <td>More complex, harder to test & maintain</td>
+            </tr>
+            <tr>
+              <td>DIT</td>
+              <td>Depth of Inheritance Tree</td>
+              <td>Depth of a class in the hierarchy</td>
+              <td>More reuse but harder to predict behavior</td>
+            </tr>
+            <tr>
+              <td>CBO</td>
+              <td>Coupling Between Object Classes</td>
+              <td>Number of classes a class depends on</td>
+              <td>Harder to test, less reusable</td>
+            </tr>
+            <tr>
+              <td>NOC</td>
+              <td>Number of Children</td>
+              <td>Number of direct subclasses</td>
+              <td>Wider influence; more testing needed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <hr class="divider">
+      <div class="card-label" style="margin-bottom:10px;">Design Goal</div>
+      <ul class="blist">
+        <li><span class="hl-green">Low WMC</span> → simpler methods, easier to test and understand</li>
+        <li><span class="hl-blue">Low DIT</span> → more predictable behavior, lower complexity</li>
+        <li><span class="hl-amber">Low CBO</span> → less coupling, more testable and reusable</li>
+        <li><span class="hl">NOC</span> → high NOC requires careful design of the parent class</li>
+      </ul>
+      <div class="note-box">
+        <div class="note-label">One-Line Summary</div>
+        <strong>WMC</strong> = method complexity sum · <strong>DIT</strong> = inheritance depth · <strong>CBO</strong> = coupling count · <strong>NOC</strong> = direct children count. All four are part of the <strong>Chidamber &amp; Kemerer (CK) Metrics Suite</strong>.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
