@@ -1,4 +1,4 @@
-# CS427 Study
+# CS 427: Software Engineering — Spring 2026, UIUC
 
 Static study site for **CS 427: Software Engineering** (UIUC) — weekly notes with tabs, embedded mind maps, and interactive quizzes. Week HTML files live at the repo root next to `index.html`.
 
@@ -45,4 +45,4 @@ then visit `http://localhost:8080/index.html`.
 
 ## Course & license
 
-Course materials belong to the university and instructors; this repo is a personal study organization project. Use respectfully and in line with your course's academic integrity rules.
+This repository is a personal revision and study resource, not an official course distribution. Course materials belong to the university and instructors. Use respectfully and in line with your course's academic integrity rules.
