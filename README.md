@@ -1,6 +1,6 @@
 # CS427 Study
 
-Static study site for **CS 427: Software Engineering** (UIUC) — weekly notes with tabs, embedded mind maps, and interactive quizzes. All content is in English under `en/`.
+Static study site for **CS 427: Software Engineering** (UIUC) — weekly notes with tabs, embedded mind maps, and interactive quizzes. Week HTML files live at the repo root next to `index.html`.
 
 ## Features
 
@@ -25,7 +25,7 @@ then visit `http://localhost:8080/index.html`.
 | Path | Role |
 |------|------|
 | `index.html` | Shell: week nav + iframe |
-| `en/*.html` | Week pages |
+| `week_*.html` (repo root) | Week pages |
 | `mindmap/*.html` | Mind maps embedded in some weeks |
 | `js/study-weeks-config.js` | Week list and labels |
 | `js/study-lang.js` | `getWeekFile`, `getWeekNavHref` — path helpers |

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Week 13 · Exam 1 Practice</title>
+<link href="css/study-sidebar.css" rel="stylesheet"/>
+<link href="css/quiz-pane.css" rel="stylesheet"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#faf9f7;--surface:#ffffff;--surface2:#f4f3f0;
+  --border:#e8e6e1;--text:#1c1b18;--text2:#4a4840;--muted:#8a8780;
+  --accent:#3d6b4f;--accent-light:#edf4ef;
+  --accent2:#7c5c2e;--accent2-light:#fdf4e7;
+  --blue:#2d5fa6;--blue-light:#ebf1fb;
+  --red:#a63d2d;--red-light:#fdf0ef;
+  --tag-bg:#f0ede8;--radius:8px;
+}
+body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--text);padding:0;min-height:100vh;}
+.week13-layout{max-width:920px;width:100%;margin:0 auto;padding:28px 22px 56px;}
+header{margin-bottom:22px;}
+header h1{font-family:'Lora',serif;font-size:1.55rem;font-weight:600;color:var(--text);letter-spacing:-0.01em;line-height:1.3;}
+.card{background:var(--surface);border-radius:var(--radius);padding:22px 24px;margin-bottom:20px;}
+.card-title{font-family:'Lora',serif;font-size:1.02rem;font-weight:600;color:var(--text);margin-bottom:10px;}
+.card-body{font-size:0.9rem;color:var(--text2);line-height:1.65;}
+.kw{font-family:'Source Code Pro',monospace;font-size:0.76rem;font-weight:500;background:var(--tag-bg);border-radius:4px;padding:3px 9px;color:var(--text2);}
+.week13-reveal-label{display:inline-flex;align-items:center;gap:8px;font-size:0.8rem;font-weight:500;color:var(--text2);cursor:pointer;user-select:none;}
+.week13-reveal-label input{width:1rem;height:1rem;accent-color:var(--blue);cursor:pointer;}
+</style>
+<link href="css/study-week-tabs.css" rel="stylesheet"/>
+<script src="js/study-week-common.js"></script>
+</head>
+<body data-study-week="week-13">
+<div class="app-shell">
+<div id="study-sidebar-root"></div>
+<div class="week13-layout">
+<header>
+<h1>Week 13 — Exam 1 (practice)</h1>
+</header>
+
+<div class="qz-wrap">
+<div class="qz-toolbar">
+<div class="qz-actions">
+<label class="week13-reveal-label">
+<input id="week13-reveal-answers" onchange="week13SetRevealMode(this.checked)" type="checkbox"/>
+<span>Show answer key</span>
+</label>
+<button class="qz-reset" onclick="resetQuiz()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-display">— / 25</span></div>
+</div>
+</div>
+<div id="questions-container"></div>
+</div>
+</div>
+</div>
+<script src="js/quiz-pane.js"></script>
+<script>
+var PRINT_METHOD_CODE =
+  'public void print(int x, int y) {\n' +
+  '  int sum = x + y;\n' +
+  '  int mul = x * y;\n' +
+  '  if (sum >= 0 && mul >= 0) {\n' +
+  '    System.out.println("all greater or equal to 0");\n' +
+  '  } else {\n' +
+  '    if (sum < 0) {\n' +
+  '      System.out.println("sum is negative");\n' +
+  '    } else {\n' +
+  '      System.out.println("sum is greater or equal to 0");\n' +
+  '    }\n' +
+  '  }\n' +
+  '}';
+
+var METHOD_VERIFY_CODE =
+  'public int method (int x) {\n' +
+  '  if (x > 10) {\n' +
+  '    x = x + 3;\n' +
+  '  } else {\n' +
+  '    x = x + 4;\n' +
+  '  }\n' +
+  '  return x;\n' +
+  '}';
+
+var EXAM1_RAW = [
+  { q: 'Which of the following is NOT a goal of pair programming?', opts: ['Staff training and transition are eased', 'Higher quality code with fewer defects is produced', 'A pair completes their tasks in less than half the time of a solo programmer completing the same tasks in terms of total person-hours', 'Faster problem-solving and quicker decision-making processes'], ans: 2, exp: 'Pair programming trades speed for quality and knowledge sharing; total effort is not typically halved versus solo work—this claim is the outlier.' },
+  { q: 'Which of the following is LEAST likely to be used for project/task planning?', opts: ['Profiler tool', 'Gantt chart', 'Trello tool', 'PERT technique'], ans: 0, exp: 'Profilers measure runtime behavior of code. Gantt charts, Trello-style boards, and PERT are planning/scheduling aids.' },
+  { q: 'Which is the most desirable process methodology for the following project? Ten experienced developers and ten new graduates are working on improving the efficiency of Amazon’s web-based order processing software. Five of the developers work in Champaign and the rest in Chicago. The application is fairly large – about 100 thousand lines of code. Fortunately, the team is mainly re-implementing the order processing functionality – but is just working to make the algorithms and database transactions more efficient so the requirements are fairly stable. One more thing – the team is mostly made up of people who like their work assignments to be predictable for quite a long period of time.', opts: ['Plan-driven methodology', 'Agile methodology'], ans: 0, exp: 'Stable requirements, predictable assignments, and distributed coordination favor a plan-driven (structured, phased) approach over iterative Agile.' },
+  { q: 'Choose words that most accurately and correctly complete the following sentence: With a/an _________ software process model, requirements are developed _________.', opts: ['agile, continuously', 'agile, once', 'spiral, once', 'waterfall, periodically'], ans: 0, exp: 'Agile embraces evolving requirements through the lifecycle (continuous refinement), unlike big upfront freeze.' },
+  { q: 'Which of the following is NOT one of the big ideas of eXtreme Programming?', opts: ['Work closely with the customer', 'Use working code as the main written product', 'Design software architecture carefully before the coding phase', 'Release code frequently'], ans: 2, exp: 'XP favors simple design and refactoring over heavy upfront architecture—big design up front is antithetical.' },
+  { q: 'The component in the MVC pattern for encapsulating app state is named ______', opts: ['View', 'Model', 'Controller'], ans: 1, exp: 'The Model holds domain state and rules; View renders; Controller handles input and coordination.' },
+  { q: 'Is the following statement true or false? “A use case describes both what a system does when interacting with an actor and how the system implements the functionality.”', opts: ['True', 'False'], ans: 1, exp: 'Use cases specify external behavior (what), not internal implementation (how).' },
+  { q: 'In use-case requirements, a scenario is best described as', opts: ["a single path through a use case’s flow of events", "describing the ‘best case’ (no error conditions) of a requirement", 'a document for helping developers write unit test cases', 'a group of user stories'], ans: 0, exp: 'A scenario is one concrete path through the flow (main or alternate).' },
+  { q: 'Requirements validation involves examining customer requirements for all of the criteria below except:', opts: ['Coupling', 'Completeness', 'Unambiguity', 'Consistency'], ans: 0, exp: 'Coupling is a design/code quality concern, not a standard requirement-quality checklist item like completeness or consistency.' },
+  { q: 'Which of the following best denotes the relationship in a class diagram between the Library class and the CheckOutCounter class, where the CheckOutCounter is a part of the Library and cannot exist without it?', opts: ['Abstraction', 'Generalization', 'Cohesion', 'Composition'], ans: 3, exp: 'Composition implies strong ownership and lifetime dependency (part cannot exist without whole).' },
+  { q: 'In class diagrams, _________ is indicated by a/an _________ .', opts: ['Aggregation, solid arrow', 'Multiplicity, dotted line', 'Generalization/inheritance, hollow arrow', 'Class, oval'], ans: 2, exp: 'Inheritance/generalization uses a hollow triangular arrowhead on the generalization line in UML class diagrams.' },
+  { q: 'Why is UML a significant development?', opts: ['It was developed as a marketing strategy to sell more software design tools.', 'It provides a tool for automatically converting diagrams into fully functional code without additional development effort.', 'It unifies the various systems for drawing requirements, designs, etc. into a common framework allowing users to share diagrams and understand their semantics.', 'It was primarily created to replace all forms of programming with visual modeling.'], ans: 2, exp: 'UML standardizes visual modeling vocabulary across analysis and design artifacts.' },
+  { q: 'Is the following statement true or false? “In a sequence diagram, neither the horizontal ordering of the objects nor the vertical ordering of the messages matters. That is, we can freely shuffle their orderings without changing the meaning of the sequence diagram.”', opts: ['True', 'False'], ans: 1, exp: 'Message vertical order encodes time sequence; object placement can carry meaningful grouping—order is not arbitrary.' },
+  { q: 'Which of the following is NOT a part of UML?', opts: ['Sequence diagram', 'Use-case diagram', 'Class diagram', 'User stories'], ans: 3, exp: 'User stories are an Agile requirements artifact, not a UML diagram type.' },
+  { q: 'Objects that model a uniform, coherent concept exhibit __________ . Objects that have complex interrelationships with many other objects exhibit __________ .', opts: ['low cohesion, low coupling', 'high cohesion, high coupling', 'low cohesion, high coupling', 'high cohesion, low coupling'], ans: 1, exp: 'Cohesion measures internal relatedness; coupling measures dependence on other objects—many links imply higher coupling.' },
+  { q: 'Which of the following design patterns is the most suitable for being used to design the following system? One popular feature on YouTube is to allow users to subscribe and unsubscribe to a channel. Whenever there is a new video published on to the channel, all the subscribers are informed of this new video. In this question, we will use object-oriented design to model a simplified version of this Channel-User relationship. Here are the requirements: 1. There are two classes, Channel and User. 2. When a user subscribes to a Channel, the user becomes a subscriber. 3. A Channel can be subscribed to and unsubscribed from by calling its subscribe() and unsubscribe() methods. 4. A Channel maintains a list of all the subscribers. 5. A User maintains a list called videoList, which contains the titles of all the videos from all the channels the user has subscribed to. 6. A Channel has a notifyNewVideo() method. When this method is called with the title of the new video as a parameter, all its subscribers should add this title to their videoList.', opts: ['Strategy Pattern', 'Composite Pattern', 'Observer Pattern', 'Visitor Pattern'], ans: 2, exp: 'Publish/subscribe notification maps to Observer (subject notifies dependents).' },
+  { q: 'Which coverage below is also called branch coverage?', opts: ['loop coverage', 'condition coverage', 'decision coverage', 'statement coverage'], ans: 2, exp: 'Branch coverage and decision coverage are equivalent names in many curricula—each decision’s outcomes are exercised.' },
+  { q: 'Which white box testing guideline is the most difficult to achieve among the three?', opts: ['100% Branch coverage', '100% Statement coverage', '100% Method coverage'], ans: 0, exp: 'Branch/decision coverage subsumes statement coverage and is stricter; method coverage is weaker than branch.' },
+  { q: 'Consider the following code, which takes two integers as an input and prints messages indicating the sign of inputs. What is the minimum number of tests to achieve 100% statement coverage? (Hint: Each combination of x and y values is considered one test. For example, one test could be both x and y to be positive)', opts: ['4', '3', '5', '7'], ans: 1, exp: 'You need one case for the first branch (e.g. both nonnegative product), one where sum < 0 in the else, and one where sum ≥ 0 but the conjunction fails (e.g. product negative)—three tests cover every statement.', code: PRINT_METHOD_CODE },
+  { q: 'Consider the following code (same as the previous question). What is the minimum number of tests to achieve 100% branch coverage?', opts: ['6', '2', '4', '3'], ans: 3, exp: 'Three tests suffice to flip the outer decision both ways and the inner decision both ways along feasible paths.', code: PRINT_METHOD_CODE },
+  { q: 'Consider the following code (same as the previous question). What is the minimum number of tests to achieve 100% condition coverage?', opts: ['8', '2', '4', '3'], ans: 1, exp: 'Minimum is 2 (Option B): one test uses the then-branch (sum ≥ 0 and mul ≥ 0); a second test covers the else-path so each atomic predicate in the decisions is forced through both true and false across the suite.', code: PRINT_METHOD_CODE },
+  { q: 'Which of the following indicates the main purpose of verification?', opts: ['Make sure that the right product is being built', 'Make sure that the product is being built right', 'Make sure that the budget is not overrun', 'Make sure that the product delivery is not delayed'], ans: 1, exp: 'Verification (building the product right) vs validation (building the right product).' },
+  { q: 'Is the following statement true or false? “For the following method, if test cases can achieve 100% statement coverage, the same set of test cases can definitely achieve 100% branch coverage.”', opts: ['False', 'True'], ans: 1, exp: 'For this specific method, the if-else has one decision and executable statements on both sides: any test suite that executes every statement must take both x > 10 and x ≤ 10, so 100% statement coverage implies 100% branch coverage here. (This is not true for arbitrary programs.)', code: METHOD_VERIFY_CODE },
+  { q: 'Which statement best expresses the main purpose of test oracles?', opts: ['Help determine whether a test passes or fails', 'Help test interactions between a database application and a database', 'Help test interaction between components', 'Store a specified input of a test in a test database'], ans: 0, exp: 'An oracle decides expected vs actual outcome for pass/fail.' },
+  { q: 'Which of the following best describes an example of a failure?', opts: ['A static analysis tool detects that some code portions may have a possible deadlock', 'A programmer makes a mistake and forgets to write a conditional check in his/her code', 'The execution of a test case causes the violation of an assertion in the test case'], ans: 2, exp: 'Failure is faulty external behavior; B is an error/fault source; A is static analysis, not a runtime failure outcome.' }
+];
+
+function normalizeExamQuestions(raw) {
+  return raw.map(function (rq, i) {
+    return {
+      num: i + 1,
+      text: rq.q,
+      options: rq.opts,
+      correct: rq.ans,
+      exp: rq.exp,
+      code: rq.code || ''
+    };
+  });
+}
+
+var examQuestionsNormalized = normalizeExamQuestions(EXAM1_RAW);
+var examQuizPane = QuizPane.mount({
+  questions: examQuestionsNormalized,
+  containerId: 'questions-container',
+  scoreId: 'score-display',
+  expandExplanationToOptions: true,
+  noGlobalReset: true
+});
+
+window.resetQuiz = function () {
+  var cb = document.getElementById('week13-reveal-answers');
+  if (cb) cb.checked = false;
+  examQuizPane.resetQuiz();
+};
+
+function week13SetRevealMode(enabled) {
+  if (enabled) {
+    examQuizPane.resetQuiz();
+    examQuestionsNormalized.forEach(function (q, i) {
+      examQuizPane.selectOption(i, q.correct);
+    });
+  } else {
+    examQuizPane.resetQuiz();
+  }
+}
+</script>
+<script src="js/study-weeks-config.js"></script>
+<script src="js/study-lang.js"></script>
+<script src="js/study-sidebar.js"></script>
+</body>
+</html>

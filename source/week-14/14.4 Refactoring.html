@@ -307,6 +307,13 @@ td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
       <div class="card-body">
         Refactoring is the process of <span class="hl">changing the internal structure</span> of a program <span class="hl-green">without changing its external behavior</span>. The observable functionality remains identical — only the code's organization, readability, or design improves.
       </div>
+
+      <div class="note-box">
+        <div class="note-label">Exam Tip</div>
+        The key distinguisher: refactoring <strong>never alters external behavior</strong>. Options mentioning "adding new features" or "altering functionality" are always wrong answers for refactoring.
+      </div>
+
+
       <div class="tbl-wrap">
         <table>
           <thead>
@@ -320,10 +327,7 @@ td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
           </tbody>
         </table>
       </div>
-      <div class="note-box">
-        <div class="note-label">Exam Tip</div>
-        The key distinguisher: refactoring <strong>never alters external behavior</strong>. Options mentioning "adding new features" or "altering functionality" are always wrong answers for refactoring.
-      </div>
+
     </div>
 
     <div class="card">
@@ -475,10 +479,6 @@ td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
         <li>Easier to unit-test smaller, extracted methods independently</li>
       </ul>
 
-      <div class="note-box">
-        <div class="note-label">Exam Tip</div>
-        "Decreases the number of methods in a class" is the trick answer — Extract Method always <strong>increases</strong> method count. All other options (reusability, readability, understandability) are genuine benefits.
-      </div>
     </div>
 
     <div class="card">
@@ -499,6 +499,7 @@ td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
   System.out.println("----");
   System.out.println("Order");
   System.out.println("----");
+  <br>
   // print items
   for (Item i : items)
     System.out.println(i);

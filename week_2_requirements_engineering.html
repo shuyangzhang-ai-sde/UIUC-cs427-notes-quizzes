@@ -5,8 +5,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Week 2 · Development Models &amp; Project Management</title>
-<link href="../css/study-sidebar.css" rel="stylesheet"/>
-<link href="../css/quiz-pane.css" rel="stylesheet"/>
+<link href="css/study-sidebar.css" rel="stylesheet"/>
+<link href="css/quiz-pane.css" rel="stylesheet"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -102,8 +102,8 @@ td:first-child{font-weight:600;color:var(--text);white-space:nowrap;}
   .qz-panel-toolbar{position:static;margin-bottom:14px;}
 }
 </style>
-<link href="../css/study-week-tabs.css" rel="stylesheet"/>
-<script src="../js/study-week-common.js"></script>
+<link href="css/study-week-tabs.css" rel="stylesheet"/>
+<script src="js/study-week-common.js"></script>
 </head>
 <body data-study-week="week-2">
 <div class="app-shell">
@@ -254,7 +254,7 @@ Jane’s off-site backup is <strong>risk protection</strong> (mitigation).</div>
 <div class="card-title">PERT and the critical path</div>
 <div class="card-body">A PERT chart is a <span class="hl-blue">DAG (directed acyclic graph)</span>; edge labels are durations. The <strong>critical path</strong> is the longest path by total duration (not necessarily the most edges).</div>
 <div class="tbl-wrap">
-<img src="../assets/quiz2-q9-graph.png" alt="PERT graph for critical path question" loading="lazy" style="display:block;width:70%;height:auto;border:none;margin:0 auto;">
+<img src="assets/quiz2-q9-graph.png" alt="PERT graph for critical path question" loading="lazy" style="display:block;width:70%;height:auto;border:none;margin:0 auto;">
 </div>
 <div class="tbl-wrap">
 <table>
@@ -398,7 +398,7 @@ const questions = [
   {
     num: 8,
     text: "For the above Gantt chart, which of the following statements is wrong?",
-    figureSrc: "../assets/quiz2-q8-gantt.png",
+    figureSrc: "assets/quiz2-q8-gantt.png",
     options: [
       "The relationship between tasks 1 and 2 satisfies the Start-To-Start constraint",
       "The relationship between tasks 2 and 3 satisfies the Finish-To-Start constraint",
@@ -416,7 +416,7 @@ const questions = [
   {
     num: 9,
     text: "For the PERT chart (A→B:6, B→C:3, B→D:10, C→E:7, D→E:5), what is the critical path?",
-    figureSrc: "../assets/quiz2-q9-graph.png",
+    figureSrc: "assets/quiz2-q9-graph.png",
     options: ["B→C→E", "B→D→E", "A→B→C→E", "A→B→D→E"],
     correct: 3,
     explanations: [
@@ -508,7 +508,7 @@ const questions = [
   }
 ];
 </script>
-<script src="../js/quiz-pane.js"></script>
+<script src="js/quiz-pane.js"></script>
 <script>
 QuizPane.mount({ questions: questions });
 
@@ -555,7 +555,7 @@ function switchQuizTab(id, btn) {
     {
       num: 5, type: 'single',
       text: 'What is the slack time of the task in red?',
-      figure: '../source/week%202/Week%202%20Practice%20Quiz%20Q5%20picture.png',
+      figure: 'source/week%202/Week%202%20Practice%20Quiz%20Q5%20picture.png',
       opts: ['8 D', '6 D', '3 D', '4 D'],
       correct: 3,
       exp: 'Slack = Latest Start − Earliest Start = 4 D.'
@@ -671,8 +671,8 @@ function switchQuizTab(id, btn) {
   });
 })();
 </script>
-<script src="../js/study-weeks-config.js"></script>
-<script src="../js/study-lang.js"></script>
-<script src="../js/study-sidebar.js"></script>
+<script src="js/study-weeks-config.js"></script>
+<script src="js/study-lang.js"></script>
+<script src="js/study-sidebar.js"></script>
 </body>
 </html>

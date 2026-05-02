@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Chapter 14 · Software Maintenance &amp; Quiz</title>
-<link href="../css/study-sidebar.css" rel="stylesheet"/>
+<link href="css/study-sidebar.css" rel="stylesheet"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&family=Source+Code+Pro:wght@400;500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -115,8 +115,8 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
   .qz-panel-toolbar{position:static;margin-bottom:14px;}
 }
 </style>
-<link href="../css/study-week-tabs.css" rel="stylesheet"/>
-<script src="../js/study-week-common.js"></script>
+<link href="css/study-week-tabs.css" rel="stylesheet"/>
+<script src="js/study-week-common.js"></script>
 </head>
 <body data-study-week="week-14">
 <div class="app-shell">
@@ -423,7 +423,6 @@ code{font-family:'Source Code Pro',monospace;font-size:0.85em;background:var(--t
 <li>Supports the <strong>Single Responsibility Principle</strong> — each method does one thing</li>
 <li>Easier to unit-test smaller, extracted methods independently</li>
 </ul>
-<div class="note-box"><div class="note-label">Exam Tip</div>"Decreases the number of methods in a class" is the trap answer — Extract Method always <strong>increases</strong> method count. Reusability, readability, and understandability are all genuine benefits.</div>
 </div>
 <div class="card">
 <div class="card-title">Extract Method — Before &amp; After</div>
@@ -689,7 +688,7 @@ function switchTab(id, btn) {
   if (qzPanel) qzPanel.classList.add('active');
 }
 </script>
-<script src="../js/quiz-pane.js"></script>
+<script src="js/quiz-pane.js"></script>
 <script>
 var CH14_RAW_QUESTIONS = [
   { q: '[14.1] Which of the following is NOT one of the four types of software maintenance?', opts: ['Corrective', 'Preventive', 'Adaptive', 'Proactive'], ans: 3, exp: 'The four types are Corrective, Adaptive, Perfective, and Preventive. Proactive is a distractor.' },
@@ -780,8 +779,8 @@ ch14Mount({
   resetGlobalName: 'resetQuizCh14_14_6'
 });
 </script>
-<script src="../js/study-weeks-config.js"></script>
-<script src="../js/study-lang.js"></script>
-<script src="../js/study-sidebar.js"></script>
+<script src="js/study-weeks-config.js"></script>
+<script src="js/study-lang.js"></script>
+<script src="js/study-sidebar.js"></script>
 </body>
 </html>

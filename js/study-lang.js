@@ -1,19 +1,16 @@
 (function () {
-  function insideLangFolder() {
-    var p = ((typeof location !== 'undefined' && location.pathname) || '').replace(/\\/g, '/');
-    return /\/(zh|en)\/[^/]+\.html$/i.test(p);
-  }
-
-  /** Path from site root, e.g. en/week_1_....html — for index iframe src */
+  /**
+   * Week HTML files live at the site root next to index.html.
+   * Path from site root for iframe src and nav: filename only (e.g. week_1_....html).
+   */
   window.getWeekFile = function (week) {
     if (!week || !week.file) return '';
-    return 'en/' + week.file;
+    return week.file;
   };
 
-  /** Nav href: from index use en/...; from inside en/ use sibling filename only. */
+  /** Nav href: same-directory links — index and week pages both sit at repo root. */
   window.getWeekNavHref = function (week) {
     if (!week || !week.file) return '';
-    if (insideLangFolder()) return week.file;
-    return window.getWeekFile(week);
+    return week.file;
   };
 })();

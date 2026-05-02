@@ -1,0 +1,8 @@
+{
+  "name": "cs427-exam-1-study",
+  "private": true,
+  "description": "Static study site (no compile step). Scripts satisfy mistaken npm usage and print how to preview.",
+  "scripts": {
+    "build:ch05": "node -e \"const fs=require('fs'); const p='week_5_oo_patterns_part_1.html'; fs.accessSync(p); console.log('OK — no build output for this repo.'); console.log('Week 5:', p); console.log('Preview: python3 -m http.server 8080  →  http://localhost:8080/index.html');\""
+  }
+}

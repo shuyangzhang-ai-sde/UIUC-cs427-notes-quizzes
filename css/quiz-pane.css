@@ -16,10 +16,21 @@
  *   </div>
  * </div>
  *
- * Requires page :root tokens: --text, --surface, --surface2, --muted, --tag-bg, --radius,
- * --accent / --accent-light, --blue / --blue-light, --correct-bg / --correct-text,
- * --wrong-* , --reveal-* , etc.
+ * Page-level :root should set --text, --surface, --bg, etc. Quiz feedback colors below
+ * have defaults in this file; individual pages may override.
  */
+
+:root {
+  --correct-bg: #dcfce7;
+  --correct-border: #16a34a;
+  --correct-text: #14532d;
+  --wrong-bg: #fee2e2;
+  --wrong-border: #dc2626;
+  --wrong-text: #7f1d1d;
+  --reveal-bg: #dbeafe;
+  --reveal-border: #2563eb;
+  --reveal-text: #1e3a8a;
+}
 
 .qz-wrap {
   font-family: 'Source Sans 3', sans-serif;

@@ -527,6 +527,71 @@ td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
   <div id="tab-compare" class="tab-panel">
 
     <div class="card">
+      <div class="card-label">对比图示</div>
+      <div class="card-title">Comparison Diagram — Size vs. Complexity</div>
+      <div class="keywords">
+        <span class="kw green">Size Metrics</span>
+        <span class="kw blue">Complexity Metrics</span>
+        <span class="kw">Definitions</span>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:0; align-items:stretch; margin:16px 0;">
+
+        <!-- Size Metrics Column -->
+        <div style="background:var(--accent-light); border:2px solid #7ab892; border-radius:10px; padding:18px 20px;">
+          <div style="font-family:'Source Code Pro',monospace; font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--accent); margin-bottom:10px;">Size Metrics</div>
+          <div style="font-family:'Lora',serif; font-size:0.95rem; font-weight:600; color:var(--text); margin-bottom:10px; line-height:1.35;">Definition</div>
+          <div style="font-size:0.85rem; color:var(--text2); line-height:1.6; margin-bottom:14px;">
+            Quantify the <strong>volume or scale</strong> of source code — how large the codebase is in terms of countable structural units. Collected by scanning, not by reading logic.
+          </div>
+          <div style="font-family:'Source Code Pro',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:6px;">Examples</div>
+          <ul class="blist" style="margin-bottom:14px;">
+            <li><span class="hl-green">LOC</span> — total lines of source code</li>
+            <li><span class="hl-green">Number of Methods</span> — functions defined per class</li>
+            <li><span class="hl-green">Number of Classes</span> — class definitions in codebase</li>
+          </ul>
+          <div style="font-family:'Source Code Pro',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:4px;">Key Question</div>
+          <div style="font-size:0.88rem; font-style:italic; color:var(--accent); font-weight:600;">"How big is the code?"</div>
+          <div style="margin-top:12px; background:white; border-radius:6px; padding:8px 12px; font-size:0.82rem; color:var(--text2); border:1px solid #b8d4c0;">
+            <span style="color:var(--red); font-weight:600;">Caveat:</span> LOC alone is <strong>not a reliable</strong> indicator of quality — more lines can mean verbosity, not value.
+          </div>
+        </div>
+
+        <!-- VS divider -->
+        <div style="display:flex; align-items:center; justify-content:center; padding:0 16px; flex-direction:column; gap:8px;">
+          <div style="width:1px; flex:1; background:var(--border2);"></div>
+          <div style="background:var(--surface2); border:2px solid var(--border2); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-family:'Source Code Pro',monospace; font-size:0.72rem; font-weight:600; color:var(--muted); flex-shrink:0;">vs</div>
+          <div style="width:1px; flex:1; background:var(--border2);"></div>
+        </div>
+
+        <!-- Complexity Metrics Column -->
+        <div style="background:var(--blue-light); border:2px solid #7aaad6; border-radius:10px; padding:18px 20px;">
+          <div style="font-family:'Source Code Pro',monospace; font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--blue); margin-bottom:10px;">Complexity Metrics</div>
+          <div style="font-family:'Lora',serif; font-size:0.95rem; font-weight:600; color:var(--text); margin-bottom:10px; line-height:1.35;">Definition</div>
+          <div style="font-size:0.85rem; color:var(--text2); line-height:1.6; margin-bottom:14px;">
+            Measure the <strong>structural complexity of code logic</strong> — how many independent execution paths exist. Requires reading the control flow, not just counting lines.
+          </div>
+          <div style="font-family:'Source Code Pro',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:6px;">Examples</div>
+          <ul class="blist" style="margin-bottom:14px;">
+            <li><span class="hl-blue">Cyclomatic Complexity (CC)</span> — independent paths through a method</li>
+            <li>Formula: <strong>CC = E − N + 2P</strong> (edges − nodes + 2 × components)</li>
+            <li>Practical: <strong>decision points + 1</strong> (if, while, for, case, &amp;&amp;, ||, ?)</li>
+          </ul>
+          <div style="font-family:'Source Code Pro',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); margin-bottom:4px;">Key Question</div>
+          <div style="font-size:0.88rem; font-style:italic; color:var(--blue); font-weight:600;">"How hard is the code to test &amp; understand?"</div>
+          <div style="margin-top:12px; background:white; border-radius:6px; padding:8px 12px; font-size:0.82rem; color:var(--text2); border:1px solid #b0c8e8;">
+            <span style="color:var(--red); font-weight:600;">Threshold:</span> CC <strong>&gt; 10</strong> = hard to test and <strong>fault-prone</strong>.
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:4px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:12px 16px; display:flex; gap:24px; flex-wrap:wrap;">
+        <div style="font-size:0.82rem; color:var(--text2);"><span class="hl-green">Size metrics</span> — found by <em>counting</em> (scan the code)</div>
+        <div style="font-size:0.82rem; color:var(--text2);"><span class="hl-blue">Complexity metrics</span> — found by <em>tracing logic</em> (read the control flow)</div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="card-label">对比总结</div>
       <div class="card-title">Size Metrics vs. Complexity Metrics</div>
       <div class="keywords">
@@ -550,6 +615,138 @@ td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; }
           </tbody>
         </table>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">场景对比</div>
+      <div class="card-title">When to Use Each Metric — Scenarios &amp; Applications</div>
+      <div class="keywords">
+        <span class="kw green">LOC</span>
+        <span class="kw green">Methods</span>
+        <span class="kw green">Classes</span>
+        <span class="kw blue">Cyclomatic Complexity</span>
+      </div>
+
+      <!-- LOC -->
+      <div style="border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:12px;">
+        <div style="background:var(--accent-light); padding:10px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #b8d4c0;">
+          <span style="font-family:'Source Code Pro',monospace; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent); background:white; border:1px solid #b8d4c0; border-radius:4px; padding:2px 8px;">Size</span>
+          <span style="font-family:'Lora',serif; font-size:0.97rem; font-weight:600; color:var(--text);">Lines of Code (LOC)</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+          <div style="padding:12px 16px; border-right:1px solid var(--border);">
+            <div style="font-family:'Source Code Pro',monospace; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;">Most Useful When</div>
+            <ul class="blist">
+              <li>Tracking <strong>codebase growth</strong> across releases or sprints</li>
+              <li>Making rough <strong>effort / cost estimates</strong> early in a project</li>
+              <li>Comparing <strong>two versions</strong> of the same file for bloat detection</li>
+              <li>Setting coarse <strong>size budgets</strong> for modules or services</li>
+            </ul>
+          </div>
+          <div style="padding:12px 16px;">
+            <div style="font-family:'Source Code Pro',monospace; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;">Specific Scenarios</div>
+            <ul class="blist">
+              <li>A PR adds 2 000 LOC — flag for extra review before merge</li>
+              <li>A "refactor" reduces LOC by 40% — sign of deduplication success</li>
+              <li>Comparing LOC between teams using the same language for productivity baselines</li>
+            </ul>
+            <div style="margin-top:8px; background:var(--red-light); border-radius:5px; padding:7px 10px; font-size:0.8rem; color:var(--text2); border:1px solid #e0b8b0;">
+              <span class="hl-red">Avoid:</span> using LOC as a quality or complexity proxy — more lines ≠ better or harder code.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Number of Methods -->
+      <div style="border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:12px;">
+        <div style="background:var(--accent-light); padding:10px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #b8d4c0;">
+          <span style="font-family:'Source Code Pro',monospace; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent); background:white; border:1px solid #b8d4c0; border-radius:4px; padding:2px 8px;">Size</span>
+          <span style="font-family:'Lora',serif; font-size:0.97rem; font-weight:600; color:var(--text);">Number of Methods</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+          <div style="padding:12px 16px; border-right:1px solid var(--border);">
+            <div style="font-family:'Source Code Pro',monospace; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;">Most Useful When</div>
+            <ul class="blist">
+              <li>Evaluating whether a class has too many <strong>responsibilities</strong> (Single Responsibility Principle)</li>
+              <li>Detecting <strong>God Objects</strong> — classes with dozens of methods doing unrelated work</li>
+              <li>Measuring the <strong>public API surface</strong> exposed by a module</li>
+              <li>Guiding <strong>Extract Class</strong> refactoring decisions</li>
+            </ul>
+          </div>
+          <div style="padding:12px 16px;">
+            <div style="font-family:'Source Code Pro',monospace; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;">Specific Scenarios</div>
+            <ul class="blist">
+              <li>A class has 50 methods → strong signal to split into cohesive sub-classes</li>
+              <li>Comparing method counts before/after a refactoring sprint to verify decomposition</li>
+              <li>Setting a per-class method limit (e.g., ≤ 20) as a team coding standard</li>
+            </ul>
+            <div style="margin-top:8px; background:var(--accent-light); border-radius:5px; padding:7px 10px; font-size:0.8rem; color:var(--text2); border:1px solid #b8d4c0;">
+              <span class="hl-green">Note:</span> measures <em>breadth</em> of a class, not the internal complexity of each method.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Number of Classes -->
+      <div style="border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:12px;">
+        <div style="background:var(--accent-light); padding:10px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #b8d4c0;">
+          <span style="font-family:'Source Code Pro',monospace; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent); background:white; border:1px solid #b8d4c0; border-radius:4px; padding:2px 8px;">Size</span>
+          <span style="font-family:'Lora',serif; font-size:0.97rem; font-weight:600; color:var(--text);">Number of Classes</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+          <div style="padding:12px 16px; border-right:1px solid var(--border);">
+            <div style="font-family:'Source Code Pro',monospace; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;">Most Useful When</div>
+            <ul class="blist">
+              <li>Assessing overall <strong>modularity</strong> and design decomposition of the system</li>
+              <li>Tracking architectural <strong>growth trends</strong> as features are added</li>
+              <li>Comparing <strong>design alternatives</strong> — more classes can mean better separation of concerns or unnecessary fragmentation</li>
+              <li>Supporting <strong>coupling / cohesion</strong> analysis alongside dependency metrics</li>
+            </ul>
+          </div>
+          <div style="padding:12px 16px;">
+            <div style="font-family:'Source Code Pro',monospace; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;">Specific Scenarios</div>
+            <ul class="blist">
+              <li>A monolith has 3 classes → flag for poor decomposition; hard to test in isolation</li>
+              <li>Microservice grows from 10 → 80 classes in one sprint → review for over-engineering</li>
+              <li>Used with CBO (Coupling Between Objects) to spot over-connected class webs</li>
+            </ul>
+            <div style="margin-top:8px; background:var(--accent-light); border-radius:5px; padding:7px 10px; font-size:0.8rem; color:var(--text2); border:1px solid #b8d4c0;">
+              <span class="hl-green">Note:</span> works best alongside cohesion/coupling metrics, not in isolation.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cyclomatic Complexity -->
+      <div style="border:1px solid #b0c8e8; border-radius:8px; overflow:hidden; margin-bottom:4px;">
+        <div style="background:var(--blue-light); padding:10px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #b0c8e8;">
+          <span style="font-family:'Source Code Pro',monospace; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--blue); background:white; border:1px solid #b0c8e8; border-radius:4px; padding:2px 8px;">Complexity</span>
+          <span style="font-family:'Lora',serif; font-size:0.97rem; font-weight:600; color:var(--text);">Cyclomatic Complexity (CC)</span>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+          <div style="padding:12px 16px; border-right:1px solid var(--border);">
+            <div style="font-family:'Source Code Pro',monospace; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;">Most Useful When</div>
+            <ul class="blist">
+              <li>Planning <strong>test coverage</strong> — CC gives the minimum branch test cases needed</li>
+              <li>Identifying methods that are <strong>high-risk for bugs</strong> (CC &gt; 10)</li>
+              <li>Prioritizing <strong>refactoring targets</strong> before a release or code review</li>
+              <li>Enforcing a team <strong>complexity budget</strong> in CI/CD pipelines (fail build if CC &gt; threshold)</li>
+            </ul>
+          </div>
+          <div style="padding:12px 16px;">
+            <div style="font-family:'Source Code Pro',monospace; font-size:0.67rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-bottom:6px;">Specific Scenarios</div>
+            <ul class="blist">
+              <li>A payment-processing method has CC = 18 → high bug risk; decompose with Extract Method</li>
+              <li>Security-critical authentication logic: enforce CC ≤ 5 for full branch coverage confidence</li>
+              <li>Legacy code audit: rank all methods by CC to build a tech-debt prioritization list</li>
+            </ul>
+            <div style="margin-top:8px; background:var(--blue-light); border-radius:5px; padding:7px 10px; font-size:0.8rem; color:var(--text2); border:1px solid #b0c8e8;">
+              <span class="hl-blue">Threshold:</span> 1–5 simple ✓ &nbsp;|&nbsp; 6–10 moderate &nbsp;|&nbsp; <strong>&gt; 10 fault-prone ✗</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="card">

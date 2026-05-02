@@ -1,6 +1,6 @@
 /**
  * 课程周次唯一数据源 — study-sidebar.js / study-index.js 共用
- * 中文页面在 zh/，英文页面在 en/，file 仅为文件名。
+ * 周页面在站点根目录，与 index.html 同级；file 仅为文件名。
  */
 window.STUDY_WEEKS = [
   { id: 'intro', num: 1, file: 'week_1_introduction_software_engineering.html', label: 'Intro to Software Engineering' },
@@ -15,7 +15,7 @@ window.STUDY_WEEKS = [
   { id: 'week-10', num: 10, file: null, label: 'Iteration 3', soon: true },
   { id: 'week-11', num: 11, file: 'week_11_debugging.html', label: 'Debugging' },
   { id: 'week-12', num: 12, file: null, label: 'Iteration 4', soon: true },
-  { id: 'week-13', num: 13, file: null, label: 'Exam 1', soon: true },
+  { id: 'week-13', num: 13, file: 'week_13_exam_1.html', label: 'Exam 1' },
   { id: 'week-14', num: 14, file: 'week_14_software_maintenance.html', label: 'Software Maintenance' },
   { id: 'week-15', num: 15, file: null, label: 'Exam 2', soon: true },
   { id: 'week-16', num: 16, file: null, label: 'Final Deliverable', soon: true }
